@@ -1,8 +1,6 @@
+var assert = require("assert")
 var fs = require('fs');
 var HPACK = require('../lib/hpack').HPACK;
-
-var testcaseDir = 'hpack-test-case/';
-var story;
 
 function isSame(mine, reference) {
     var i, n = mine.length, name;
@@ -19,32 +17,35 @@ function isSame(mine, reference) {
     return true;
 };
 
-function testEncode() {
-};
 
-function testDecode(reference) {
-    var lastStoryNumber = 31;
-    var i, j, impl, decoded, nCase;
+describe('HAPCK', function () {
+    var nStory = 31;
+    var reference = 'nghttp2';
+    var testcaseDir = 'test/hpack-test-case/';
 
-    for (i = 1; i <= lastStoryNumber; i++) {
-        impl = new HPACK();
-        console.log('story #' + i);
-        story = JSON.parse(fs.readFileSync(testcaseDir + reference + '/story_' + (parseInt(i / 10) ? '' : '0') + '' + i + '.json'));
-        nCase = story.cases.length;
-        for (j = 0; j < nCase; j++) {
-            decoded = impl.decode(new Buffer(story.cases[j].wire, 'hex'));
-            if (isSame(story.cases[j].headers, decoded)) {
-                console.log('Story #' + i + ' seq #' + j + ': OK');
-            } else{
-                console.log('Story #' + i + ' seq #' + j + ': NG');
-                console.log('expected');
-                console.log(story.cases[j].headers);
-                console.log('actual');
-                console.log(decoded);
-            };
+    describe('#decode()', function () {
+        var i, j, impl, story, decoded, nCase;
 
+        beforeEach(function () {
+            impl = new HPACK();
+        });
+
+        for (i = 1; i <= nStory; i++) {
+            (function () {
+                var storyNumber = i;
+                it('should decode wire data as same as reference implementation on the story ' + storyNumber, function () {
+                    story = JSON.parse(fs.readFileSync(testcaseDir + reference + '/story_' + (parseInt(storyNumber / 10) ? '' : '0') + '' + storyNumber + '.json'));
+                    nCase = story.cases.length;
+                    for (j = 0; j < nCase; j++) {
+                        decoded = impl.decode(new Buffer(story.cases[j].wire, 'hex'));
+                        assert(isSame(story.cases[j].headers, decoded), 'Story ' + storyNumber + ' seq ' + j);
+                    }
+                });
+            })();
         }
-    }
-};
+    });
 
-testDecode('nghttp2');
+    describe('#encode()', function () {
+        it('should encode raw-data, and the encoded data shoud be decodable.');
+    });
+});
