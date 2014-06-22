@@ -18,7 +18,7 @@ function isSame(mine, reference) {
 };
 
 
-describe('HAPCK', function () {
+describe('HPACK', function () {
     var nStory = 31;
     var reference = 'nghttp2';
     var testcaseDir = 'test/hpack-test-case/';
