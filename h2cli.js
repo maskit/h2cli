@@ -140,9 +140,9 @@ commands.get = function (args, callback) {
         'close': function () {
             console.log('Response');
             console.log(' Header');
-            for (var h in response.header) {
-                console.log('  ' + h + ': ' + response.header[h]);
-            }
+            response.header.forEach(function (h) {
+                console.log('  ' + h[0] + ': ' + h[1]);
+            });
             console.log(' Body');
             console.log('  ' + response.body.toString());
             callback();
