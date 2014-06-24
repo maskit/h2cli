@@ -2,19 +2,16 @@ var assert = require("assert")
 var fs = require('fs');
 var HPACK = require('../lib/hpack').HPACK;
 
-function isSame(mine, reference) {
-    var i, n = mine.length, name;
-
-    if (mine.length !== reference.length) {
-        return false;
-    }
-    for (i = 0; i < n; i++) {
-        name = mine[i][0];
-        if (mine[i][1] !== reference[name]) {
-            return false;
+function convertForTest(headers) {
+    var i, n, entry, converted = {};
+    for (i = 0; i < headers.length; i++) {
+        if (headers[i] instanceof Array) {
+            converted[headers[i][0]] = headers[i][1];
+        } else {
+            converted[Object.keys(headers[i])[0]] = headers[i][Object.keys(headers[i])[0]];
         }
     }
-    return true;
+    return converted;
 };
 
 
@@ -30,7 +27,7 @@ describe('HPACK', function () {
             impl = new HPACK();
         });
 
-        for (i = 1; i <= nStory; i++) {
+        for (i = 0; i <= nStory; i++) {
             (function () {
                 var storyNumber = i;
                 it('should decode wire data as same as reference implementation on the story ' + storyNumber, function () {
@@ -38,7 +35,7 @@ describe('HPACK', function () {
                     nCase = story.cases.length;
                     for (j = 0; j < nCase; j++) {
                         decoded = impl.decode(new Buffer(story.cases[j].wire, 'hex'));
-                        assert(isSame(story.cases[j].headers, decoded), 'Story ' + storyNumber + ' seq ' + j);
+                        assert.deepEqual(convertForTest(decoded), convertForTest(story.cases[j].headers), 'Story ' + storyNumber + ' seq ' + j);
                     }
                 });
             })();
