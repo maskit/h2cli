@@ -1,7 +1,7 @@
 h2cli
 =====
 
-Command line interface for HTTP/2
+A command line interface for HTTP/2
 
 
 Status
