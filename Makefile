@@ -3,7 +3,7 @@
 test:
 	mocha --reporter list
 
-test-coveralls:
+test-coverage:
 	mocha --require blanket --reporter html-cov 
 
 test-coveralls:
