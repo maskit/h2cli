@@ -39,27 +39,29 @@ SEND: [Lenght: 0, Type: SETTINGS(4), Flags: 1, StreamID: 0]
  Flags: ACK
 
 h2> head /
-SEND: [Lenght: 0, Type: HEADERS(1), Flags: 5, StreamID: 1]
+SEND: [Lenght: 22, Type: HEADERS(1), Flags: 5, StreamID: 1]
  Flags: END_STREAM | END_HEADERS
-RECV: [Lenght: 675, Type: HEADERS(1), Flags: 5, StreamID: 1]
+RECV: [Lenght: 678, Type: HEADERS(1), Flags: 5, StreamID: 1]
  Flags: END_STREAM | END_HEADERS
-{ ':status': '200',
-  'cache-control': 'no-cache, no-store, must-revalidate, pre-check=0, post-check=0',
-  'content-length': '52088',
-  'content-type': 'text/html;charset=utf-8',
-  date: 'Sun, 22 Jun 2014 08:28:16 GMT',
-  expires: 'Tue, 31 Mar 1981 05:00:00 GMT',
-  'last-modified': 'Sun, 22 Jun 2014 08:28:16 GMT',
-  ms: 'S',
-  pragma: 'no-cache',
-  server: 'tfe',
-  'set-cookie': 'goth=1\u0000_twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoHaWQiJTM5MTQ4YmZmNWY0NzJjOTI1YTQxM2My%250AOGNlOTE3OWQzOgxjc3JmX2lkIiU0MWQ0Zjc2NzNiMWVhMDNiZDhkYzI1Yzc4%250AMTFiNzg4YjoPY3JlYXRlZF9hdGwrCESssMJGAQ%253D%253D--233322864639b2628e149ee41aa9677cbd5c1165; Path=/; Domain=.twitter.com; Secure; HTTPOnly\u0000guest_id=v1%3A140342569683588235; Domain=.twitter.com; Path=/; Expires=Tue, 21-Jun-2016 08:28:16 ',
-  status: '200 OK',
-  'strict-transport-security': 'max-age=631138519',
-  'x-content-type-options': 'nosniff',
-  'x-frame-options': 'SAMEORIGIN',
-  'x-transaction': 'c2d27dc9faf1cb0b',
-  'x-ua-compatible': 'IE=edge,chrome=1',
-  'x-xss-protection': '1; mode=block' }
-h2>
+[ [ ':status', '200' ],
+  [ 'cache-control',
+    'no-cache, no-store, must-revalidate, pre-check=0, post-check=0' ],
+  [ 'content-length', '52189' ],
+  [ 'content-type', 'text/html;charset=utf-8' ],
+  [ 'date', 'Sat, 28 Jun 2014 11:29:25 GMT' ],
+  [ 'expires', 'Tue, 31 Mar 1981 05:00:00 GMT' ],
+  [ 'last-modified', 'Sat, 28 Jun 2014 11:29:25 GMT' ],
+  [ 'ms', 'S' ],
+  [ 'pragma', 'no-cache' ],
+  [ 'server', 'tfe' ],
+  [ 'set-cookie',
+    'goth=1\u0000_twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlN2JhYzBhZGZhMTA2MDRhNDc0%250AZmNiZDYyNWYzNGM0YjI6D2NyZWF0ZWRfYXRsKwjHrTziRgE6B2lkIiU4YjJk%250AYTRjZjdkMmFlZGE0NWQzZDQzN2E2ODA4ZGM1Yw%253D%253D--c3c844c6010082ddbacd5930f05717937e870481; Path=/; Domain=.twitter.com; Secure; HTTPOnly\u0000guest_id=v1%3A140395496595882697; Domain=.twitter.com; Path=/; Expires=Mon, 27-Jun-2016 11:29:25 UTC' ],
+  [ 'status', '200 OK' ],
+  [ 'strict-transport-security', 'max-age=631138519' ],
+  [ 'x-content-type-options', 'nosniff' ],
+  [ 'x-frame-options', 'SAMEORIGIN' ],
+  [ 'x-transaction', 'f0f5bf06658d009f' ],
+  [ 'x-ua-compatible', 'IE=edge,chrome=1' ],
+  [ 'x-xss-protection', '1; mode=block' ] ]
+h2> 
 ```
