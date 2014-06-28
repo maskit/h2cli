@@ -12,8 +12,9 @@ Status
     - Server push is not supported yet.
     - No error handlings.
 - HPACK
-    - Passes all (#00 to 31) test stories in [http2jp/hpack-test-case](https://github.com/http2jp/hpack-test-case/) with default size of the header table.
-    - Encoder works, but the implementation never use 'without Indexing', 'never Indexed' nor huffman encoding.
+    - Passes all (#00 to 31) test stories in [http2jp/hpack-test-case](https://github.com/http2jp/hpack-test-case/)
+        - Decoder can interpret wire data of nghttp2 and hyper-hpack.
+        - Encoder works, but the implementation never use 'without Indexing', 'never Indexed' nor huffman encoding.
 
 
 What is this for?
