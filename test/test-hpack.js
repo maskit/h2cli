@@ -85,7 +85,7 @@ describe('HPACK', function () {
                     for (j = 0; j < nCase; j++) {
                         wire = impl.encode(convertForInput(story.cases[j].headers));
                         decoded = impl.decode(wire);
-                        assert.deepEqual(convertForCompare(decoded), convertForCompare(story.cases[j].headers), 'Story ' + storyNumber + ' seq ' + j);
+                        assert(isSame(decoded, convertForInput(story.cases[j].headers)), 'Story ' + storyNumber + ' seq ' + j);
                     }
                 });
             })();
