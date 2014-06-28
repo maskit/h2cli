@@ -10,6 +10,25 @@ function convertForInput(headers) {
     return converted;
 };
 
+function isSame (actual, expected) {
+    var i, j, n;
+    if (actual.length !== expected.length) {
+        return false;
+    }
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            if (actulal[i][0] === expected[j][0] && actual[i][1] === expected[j][1]) {
+                break;
+            }
+        }
+        if (j === n) {
+            return false;
+        }
+    }
+    // TODO: should check field order
+    return true;
+};
+
 function convertForCompare(headers) {
     var i, n, entry, converted = {};
     for (i = 0; i < headers.length; i++) {
@@ -43,7 +62,7 @@ describe('HPACK', function () {
                     nCase = story.cases.length;
                     for (j = 0; j < nCase; j++) {
                         decoded = impl.decode(new Buffer(story.cases[j].wire, 'hex'));
-                        assert.deepEqual(convertForCompare(decoded), convertForCompare(story.cases[j].headers), 'Story ' + storyNumber + ' seq ' + j);
+                        assert(isSame(decoded, convertForInput(story.cases[j].headers)), 'Story ' + storyNumber + ' seq ' + j);
                     }
                 });
             })();
