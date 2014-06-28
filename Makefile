@@ -1,4 +1,4 @@
 .PHONY: test
 
 test:
-	mocha -R list
+	mocha --require blanket --reporter json-cov 
