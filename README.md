@@ -6,8 +6,14 @@ Command line interface for HTTP/2
 
 Status
 ------
-
-You might be able to send a super simple GET request only once.
+- h2-13 and hpack-08.
+- HTTP/2
+    - Stream priority is not implemented yet.
+    - Server push is not supported yet.
+    - No error handlings.
+- HPACK
+    - Passes all (#00 to 32) test stories in [http2/hpack-test-case](https://github.com/http2jp/hpack-test-case/) with default size of the header table.
+    - Maximum Header Table Size Change is not implemented yet.
 
 
 What is this for?
