@@ -6,6 +6,10 @@ Command line interface for HTTP/2
 
 Status
 ------
+
+[![Build Status](https://travis-ci.org/maskit/h2cli.svg?branch=master)](https://travis-ci.org/maskit/h2cli)
+[![Coverage Status](https://img.shields.io/coveralls/maskit/h2cli.svg)](https://coveralls.io/r/maskit/h2cli?branch=master)
+
 - h2-13 and hpack-08.
 - HTTP/2
     - Stream priority is not implemented yet.
