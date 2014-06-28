@@ -1,4 +1,10 @@
 .PHONY: test
 
 test:
-	mocha --require blanket --reporter json-cov 
+	mocha --reporter list
+
+test-coveralls:
+	mocha --require blanket --reporter html-cov 
+
+test-coveralls:
+	mocha --require blanket --reporter mocha-lcov-reporter | coveralls

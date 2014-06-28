@@ -2,7 +2,9 @@
   "name": "h2cli",
   "description": "A command line interface for HTTP/2",
   "version": "0.0.0",
-  "bin": {"h2cli": "./h2cli.js"},
+  "bin": {
+    "h2cli": "./h2cli.js"
+  },
   "directories": {
     "test": "test"
   },
@@ -23,12 +25,14 @@
   },
   "homepage": "https://github.com/maskit/h2cli",
   "devDependencies": {
-      "mocha": "~1.20.1",
-      "blanket": "~1.1.6"
+    "mocha": "~1.20.1",
+    "blanket": "~1.1.6",
+    "coveralls": "^2.10.1"
+    "mocha-lcov-reporter": "0.0.1"
   },
   "config": {
     "blanket": {
       "pattern": "h2cli/lib"
     }
-  }
+  },
 }
