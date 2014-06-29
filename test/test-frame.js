@@ -150,9 +150,29 @@ describe('Http2DataFrame:', function () {
         });
     });
     describe('#toString()', function () {
-        var frame = new h2frame.Http2DataFrame();
+        var frame;
+
+        beforeEach(function () {
+            frame = new h2frame.Http2DataFrame();
+        });
+
         it('should return a string containing frame name', function () {
             assert.notEqual(frame.toString().indexOf('DATA'), -1);
+        });
+        it('should return a string representation of the flags', function () {
+            assert.equal(frame.toString().indexOf('END_STREAM'), -1);
+            assert.equal(frame.toString().indexOf('END_SEGMENT'), -1);
+            assert.equal(frame.toString().indexOf('END_PADDED'), -1);
+            frame.flags = h2frame.Http2DataFrame.FLAG_END_STREAM;
+            assert.notEqual(frame.toString().indexOf('END_STREAM'), -1);
+            frame.flags = h2frame.Http2DataFrame.FLAG_END_SEGMENT;
+            assert.notEqual(frame.toString().indexOf('END_SEGMENT'), -1);
+            frame.flags = h2frame.Http2DataFrame.FLAG_PADDED;
+            assert.notEqual(frame.toString().indexOf('PADDED'), -1);
+        });
+        it('should return a string containing padding length', function () {
+            frame.setData(new Buffer(128), 10);
+            assert.notEqual(frame.toString().indexOf('Padding: 10'), -1);
         });
     });
     describe('#getBuffer()', function () {
@@ -243,6 +263,9 @@ describe('Http2PingFrame:', function () {
         var frame = new h2frame.Http2PingFrame();
         it('should return a string containing frame name', function () {
             assert.notEqual(frame.toString().indexOf('PING'), -1);
+        });
+        it('should return a string containing payload informatin', function () {
+            assert.notEqual(frame.toString().indexOf('Payload:'), -1);
         });
     });
     describe('#getBuffer()', function () {
