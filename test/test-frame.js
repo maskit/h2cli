@@ -171,7 +171,7 @@ describe('Http2FrameFactory:', function () {
             // PRIORITY
             buf = new Buffer([0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
-            assert(frame instanceof h1frame.Http2PriorityFrame);
+            assert(frame instanceof h2frame.Http2PriorityFrame);
             // RST_STREAM
             buf = new Buffer([0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
