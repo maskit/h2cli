@@ -86,6 +86,120 @@ describe('Http2Frame:', function () {
     });
 });
 
+describe('Http2DataFrame:', function () {
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2DataFrame();
+        it('should have no payload', function () {
+            assert.equal(frame.length, 0);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2DataFrame();
+        it('should have type value of DATA frame', function () {
+            assert.equal(frame.type , 0);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2DataFrame();
+        it('should have no flags', function () {
+            assert.equal(frame.flags, 0);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2DataFrame();
+        it('should have streamId zero', function () {
+            assert.equal(frame.streamId, 0);
+        });
+    });
+    describe('A frame created with buffer', function () {
+        var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]);
+        var frame = new h2frame.Http2DataFrame(buf);
+        it('should have same data', function () {
+            assert.deepEqual(frame.getBuffer(), buf);
+        });
+    });
+    describe('FLAG_END_STREAM', function () {
+        it('should be a constant value for END_STREAM flag', function () {
+            assert.equal(h2frame.Http2DataFrame.FLAG_END_STREAM, 0x1);
+            h2frame.Http2DataFrame.FLAG_END_STREAM = 9999;
+            assert.equal(h2frame.Http2DataFrame.FLAG_END_STREAM, 0x1);
+        });
+    });
+    describe('FLAG_END_SEGMENT', function () {
+        it('should be a constant value for END_SEGMENT flag', function () {
+            assert.equal(h2frame.Http2DataFrame.FLAG_END_SEGMENT, 0x2);
+            h2frame.Http2DataFrame.FLAG_END_SEGMENT = 9999;
+            assert.equal(h2frame.Http2DataFrame.FLAG_END_SEGMENT, 0x2);
+        });
+    });
+    describe('FLAG_PADDED', function () {
+        it('should be a constant value for PADDED flag', function () {
+            assert.equal(h2frame.Http2DataFrame.FLAG_PADDED, 0x8);
+            h2frame.Http2DataFrame.FLAG_PADDED = 9999;
+            assert.equal(h2frame.Http2DataFrame.FLAG_PADDED, 0x8);
+        });
+    });
+    describe('padLength property', function () {
+        var frame = new h2frame.Http2DataFrame(new Buffer([
+                0x00, 0x0A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x00]));
+        it('should return length of pad', function () {
+            assert.equal(frame.padLength, 1);
+            frame.setData(new Buffer([]), 0);
+            assert.equal(frame.padLength, 0);
+        });
+    });
+    describe('#toString()', function () {
+        var frame = new h2frame.Http2DataFrame();
+        it('should return a string containing frame name', function () {
+            assert.notEqual(frame.toString().indexOf('DATA'), -1);
+        });
+    });
+    describe('#getBuffer()', function () {
+        var buf = new Buffer([
+            0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
+        var frame = new h2frame.Http2DataFrame(buf);
+        it('should return a buffer, and its length should be sum of frame length plus 8', function () {
+            assert(frame.getBuffer() instanceof Buffer);
+            assert.equal(frame.getBuffer().length, frame.length + 8);
+        });
+        it('should return whole data', function () {
+            assert.deepEqual(frame.getBuffer(), buf);
+        });
+    });
+    describe('#getData()', function () {
+        var frame = new h2frame.Http2DataFrame(new Buffer([
+                0x00, 0x0A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x00]));
+        it('should return a buffer, and its length should be same as frame length minus padding length', function () {
+            assert(frame.getData() instanceof Buffer);
+            assert.equal(frame.getData().length, 8);
+            assert.equal(frame.getData().length, frame.length - frame.padLength - 1);
+        });
+        it('should return data part', function () {
+            assert.deepEqual(frame.getData(), new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]));
+        });
+    });
+    describe('#setData()', function () {
+        var frame = new h2frame.Http2DataFrame(new Buffer([
+                0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]));
+        it('should change data part', function () {
+            var data = new Buffer([0x0A, 0x0B, 0x0C, 0x0D]);
+            frame.setData(data);
+            assert.deepEqual(frame.getData(), data);
+            assert.deepEqual(frame.getBuffer().slice(8), data);
+            frame.setData(data, 2);
+            assert.deepEqual(frame.getData(), data);
+            assert.deepEqual(frame.getBuffer().slice(9, 13), data);
+            frame.setData(data);
+            assert.deepEqual(frame.getData(), data);
+            assert.deepEqual(frame.getBuffer().slice(8), data);
+        });
+    });
+});
+
 describe('Http2PingFrame:', function () {
     describe('A frame created without buffer', function () {
         var frame = new h2frame.Http2PingFrame();
@@ -96,7 +210,7 @@ describe('Http2PingFrame:', function () {
     describe('A frame created without buffer', function () {
         var frame = new h2frame.Http2PingFrame();
         it('should have type value of PING frame', function () {
-            assert.equal(frame.flags, 0);
+            assert.equal(frame.type, 6);
         });
     });
     describe('A frame created without buffer', function () {
@@ -114,8 +228,8 @@ describe('Http2PingFrame:', function () {
     describe('A frame created with buffer', function () {
         var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]);
         var frame = new h2frame.Http2PingFrame(buf);
-        it('should have the buffer', function () {
-            assert.equal(frame.getBuffer(), buf);
+        it('should have same data', function () {
+            assert.deepEqual(frame.getBuffer(), buf);
         });
     });
     describe('FLAG_ACK', function () {
