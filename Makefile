@@ -3,8 +3,8 @@
 test:
 	mocha --reporter list
 
-test-coverage:
-	mocha --require blanket --reporter html-cov 
+test-coverage: test
+	mocha --require blanket --reporter html-cov > coverage.html
 
-test-coveralls:
+test-coveralls: test
 	mocha --require blanket --reporter mocha-lcov-reporter | coveralls
