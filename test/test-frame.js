@@ -139,6 +139,17 @@ describe('Http2DataFrame:', function () {
             assert.equal(h2frame.Http2DataFrame.FLAG_PADDED, 0x8);
         });
     });
+    describe('length property', function () {
+        var frame;
+        it('should be the length of payload', function () {
+            frame = new h2frame.Http2DataFrame();
+            assert.equal(frame.length, 0);
+            frame.setData(new Buffer([0, 0, 0, 0]), 0);
+            assert.equal(frame.length, 4);
+            frame.setData(new Buffer([0, 0, 0, 0, 0]), 2);
+            assert.equal(frame.length, 8);
+        });
+    });
     describe('padLength property', function () {
         var frame = new h2frame.Http2DataFrame(new Buffer([
                 0x00, 0x0A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
@@ -354,16 +365,16 @@ describe('Http2FrameFactory:', function () {
                 }
             };
             blockSize = 0;
-            frames = h2frame.Http2FrameFactory.createRequestFrames({}, hpackMock);
+            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, {});
             assert.equal(frames.length, 1);
             blockSize = 1;
-            frames = h2frame.Http2FrameFactory.createRequestFrames({}, hpackMock);
+            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, {});
             assert.equal(frames.length, 1);
             blockSize = 16383;
-            frames = h2frame.Http2FrameFactory.createRequestFrames({}, hpackMock);
+            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, {});
             assert.equal(frames.length, 1);
             blockSize = 16384;
-            frames = h2frame.Http2FrameFactory.createRequestFrames({}, hpackMock);
+            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, {});
             assert.equal(frames.length, 2);
         });
     });
