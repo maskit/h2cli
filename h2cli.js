@@ -7,8 +7,7 @@ require('./lib/ext/blocked');
 var commands = require('./lib/command');
 
 var completer = function (line) {
-    completions = Object.getOwnPropertyNames(commands);
-    return [completions, line];
+    return commands.getCompletions(line);
 };
 
 var rl = require('readline').createInterface(process.stdin, process.stdout, completer);
@@ -22,10 +21,12 @@ rl.clearColor = function () {
 rl.prompt();
 rl.on('line', function(line) {
     var args = line.trim().split(' ');
-    var cmd = commands[args[0]]
+    var cmd = commands.table[args[0]]
     var callback = function() { rl.prompt(); };
     if (cmd) {
-        cmd(args, callback);
+        cmd.exec(args, callback);
+    } else if (typeof cmd === 'undefined') {
+        callback();
     } else {
         console.error('Unknown command `' + args[0] + '`');
         callback();
