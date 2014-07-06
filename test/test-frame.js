@@ -231,6 +231,245 @@ describe('Http2DataFrame:', function () {
     });
 });
 
+describe('Http2SettingsFrame:', function () {
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2SettingsFrame();
+        it('should have 0 octets of payload', function () {
+            assert.equal(frame.length, 0);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2SettingsFrame();
+        it('should have type value of SETTINGS frame', function () {
+            assert.equal(frame.type, 4);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2SettingsFrame();
+        it('should have no flags', function () {
+            assert.equal(frame.flags, 0);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2SettingsFrame();
+        it('should have streamId zero', function () {
+            assert.equal(frame.streamId, 0);
+        });
+    });
+    describe('A frame created with buffer', function () {
+        var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]);
+        var frame = new h2frame.Http2SettingsFrame(buf);
+        it('should have same data', function () {
+            assert.deepEqual(frame.getBuffer(), buf);
+        });
+    });
+    describe('FLAG_ACK', function () {
+        it('should be a constant value for ACK flag', function () {
+            assert.equal(h2frame.Http2SettingsFrame.FLAG_ACK, 0x1);
+            h2frame.Http2SettingsFrame.FLAG_ACK = 9999;
+            assert.equal(h2frame.Http2SettingsFrame.FLAG_ACK, 0x1);
+        });
+    });
+    describe('PARAM_SETTINGS_HEADER_TABLE_SIZE', function () {
+        it('should be a constant value for SETTINGS_HEADER_TABLE_SIZE(0x1)', function () {
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_HEADER_TABLE_SIZE, 0x1);
+            h2frame.Http2SettingsFrame.PARAM_SETTINGS_HEADER_TABLE_SIZE = 9999;
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_HEADER_TABLE_SIZE, 0x1);
+        });
+    });
+    describe('PARAM_SETTINGS_ENABLE_PUSH', function () {
+        it('should be a constant value for SETTINGS_ENABLE_PUSH(0x2)', function () {
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_ENABLE_PUSH, 0x2);
+            h2frame.Http2SettingsFrame.PARAM_SETTINGS_ENABLE_PUSH = 9999;
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_ENABLE_PUSH, 0x2);
+        });
+    });
+    describe('PARAM_SETTINGS_MAX_CONCURRENT_STREAMS', function () {
+        it('should be a constant value for SETTINGS_MAX_CONCURRENT_STREAMS(0x3)', function () {
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_CONCURRENT_STREAMS, 0x3);
+            h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_CONCURRENT_STREAMS= 9999;
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_CONCURRENT_STREAMS, 0x3);
+        });
+    });
+    describe('PARAM_SETTINGS_INITIAL_WINDOW_SIZE', function () {
+        it('should be a constant value for SETTINGS_INITIAL_WINDOW_SIZE(0x4)', function () {
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_INITIAL_WINDOW_SIZE, 0x4);
+            h2frame.Http2SettingsFrame.PARAM_SETTINGS_INITIAL_WINDOW_SIZE= 9999;
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_INITIAL_WINDOW_SIZE, 0x4);
+        });
+    });
+    describe('#toString()', function () {
+        var frame = new h2frame.Http2SettingsFrame();
+        it('should return a string containing frame name', function () {
+            assert.notEqual(frame.toString().indexOf('SETTINGS'), -1);
+        });
+        it('should return a string representation of the flags', function () {
+            assert.equal(frame.toString().indexOf('ACK'), -1);
+            frame.flags = h2frame.Http2SettingsFrame.FLAG_ACK;
+            assert.notEqual(frame.toString().indexOf('ACK'), -1);
+        });
+        it('should return a string containing parameter information', function () {
+            assert.equal(frame.toString().indexOf('Params:'), -1);
+            frame.setParam(1, 100);
+            frame.setParam(2, 200);
+            frame.setParam(3, 300);
+            frame.setParam(4, 400);
+            assert.notEqual(frame.toString().indexOf('Params:'), -1);
+            assert.notEqual(frame.toString().indexOf('SETTINGS_HEADER_TABLE_SIZE: 100'), -1);
+            assert.notEqual(frame.toString().indexOf('SETTINGS_ENABLE_PUSH: 200'), -1);
+            assert.notEqual(frame.toString().indexOf('SETTINGS_MAX_CONCURRENT_STREAMS: 300'), -1);
+            assert.notEqual(frame.toString().indexOf('SETTINGS_INITIAL_WINDOW_SIZE: 400'), -1);
+        });
+    });
+    describe('#getBuffer()', function () {
+        var frame;
+        beforeEach(function () {
+            frame = new h2frame.Http2SettingsFrame();
+        });
+        it('should return a buffer, and its length should be 8 octets if there are no params.', function () {
+            assert(frame.getBuffer() instanceof Buffer);
+            assert.equal(frame.getBuffer().length, 8);
+        });
+        it('should return a buffer, and its length should be 16 octets if there is one params.', function () {
+            frame.setParam(1, 100);
+            assert(frame.getBuffer() instanceof Buffer);
+            assert.equal(frame.getBuffer().length, 14);
+        });
+        it('should return a buffer, and its length should be 24 octets if there is two params.', function () {
+            frame.setParam(1, 100);
+            frame.setParam(2, 100);
+            assert(frame.getBuffer() instanceof Buffer);
+            assert.equal(frame.getBuffer().length, 20);
+        });
+    });
+    describe('#getParamCount()', function () {
+        var frame;
+        beforeEach(function () {
+            frame = new h2frame.Http2SettingsFrame();
+        });
+        it('should return 0 if there are no params.', function () {
+            assert.equal(frame.getParamCount(), 0);
+        });
+        it('should return 1 if there is one params. #1', function () {
+            frame = new h2frame.Http2SettingsFrame(new Buffer([
+                    0x00, 0x06, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x01, 0x00, 0x00, 0x00, 0x00]));
+            assert.equal(frame.getParamCount(), 1);
+            frame.setParam(1, 100);
+            assert.equal(frame.getParamCount(), 1);
+        });
+        it('should return 1 if there is one params. #2', function () {
+            frame.setParam(1, 100);
+            assert.equal(frame.getParamCount(), 1);
+        });
+    });
+    describe('#getParamByIndex', function () {
+        var frame;
+        beforeEach(function () {
+            frame = new h2frame.Http2SettingsFrame();
+        });
+        it('should return \'undefined\' if there are no paramters.', function () {
+            var param = frame.getParamByIndex(0);
+            assert.equal(param, void(0));
+            param = frame.getParamByIndex(1);
+            assert.equal(param, void(1));
+        });
+        it('should return the id and value of the parameter specified with the index', function () {
+            frame = new h2frame.Http2SettingsFrame(new Buffer([
+                    0x00, 0x0C, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x01, 0x00, 0x00, 0x00, 0xFF,
+                    0x00, 0x02, 0x00, 0x00, 0xFF, 0xFF]));
+            var param = frame.getParamByIndex(0);
+            assert(param);
+            assert.equal(param.id, 0x01);
+            assert.equal(param.value, 0xFF);
+
+            param = frame.getParamByIndex(1);
+            assert.equal(param.id, 0x02);
+            assert.equal(param.value, 0xFFFF);
+        });
+    });
+    describe('#getParamById', function () {
+        var frame;
+        beforeEach(function () {
+            frame = new h2frame.Http2SettingsFrame();
+        });
+        it('should return \'undefined\' if there are no paramters.', function () {
+            var param = frame.getParamById(1);
+            assert.equal(param, void(0));
+        });
+        it('should return the id and value of the parameter specified with id', function () {
+            frame = new h2frame.Http2SettingsFrame(new Buffer([
+                    0x00, 0x0C, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x01, 0x00, 0x00, 0x00, 0xFF,
+                    0x00, 0x02, 0x00, 0x00, 0xFF, 0xFF]));
+            var param = frame.getParamById(1);
+            assert(param);
+            assert.equal(param.id, 0x01);
+            assert.equal(param.value, 0xFF);
+
+            param = frame.getParamById(2);
+            assert.equal(param.id, 0x02);
+            assert.equal(param.value, 0xFFFF);
+        });
+    });
+    describe('#getParamIndexOf', function () {
+        var frame;
+        beforeEach(function () {
+            frame = new h2frame.Http2SettingsFrame();
+        });
+        it('should return \'undefined\' if there are no paramters.', function () {
+            var index = frame.getParamIndexOf(1);
+            assert.equal(index, void(0));
+        });
+        it('should return a index of the parameter specified with id', function () {
+            frame = new h2frame.Http2SettingsFrame(new Buffer([
+                    0x00, 0x0C, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x01, 0x00, 0x00, 0x00, 0xFF,
+                    0x00, 0x02, 0x00, 0x00, 0xFF, 0xFF]));
+            var index = frame.getParamIndexOf(0x01);
+            assert.equal(index, 0);
+
+            index = frame.getParamIndexOf(0x02);
+            assert.equal(index, 1);
+        });
+    });
+    describe('#setParam', function () {
+        var frame;
+        beforeEach(function () {
+            frame = new h2frame.Http2SettingsFrame();
+        });
+        it('should set a parameter', function () {
+            frame.setParam(0x01, 100);
+            frame.setParam(0x02, 999);
+            var param;
+
+            assert.equal(2, frame.getParamCount());
+
+            param = frame.getParamByIndex(0);
+            assert(param);
+            assert.equal(param.id, 1);
+            assert.equal(param.value, 100);
+
+            param = frame.getParamByIndex(1);
+            assert(param);
+            assert.equal(param.id, 2);
+            assert.equal(param.value, 999);
+        });
+        it('should overwrite a parameter', function () {
+            frame.setParam(0x01, 100);
+            frame.setParam(0x01, 999);
+
+            assert.equal(1, frame.getParamCount());
+
+            var param = frame.getParamByIndex(0);
+            assert(param);
+            assert.equal(param.id, 1);
+            assert.equal(param.value, 999);
+        });
+    });
+});
+
 describe('Http2PingFrame:', function () {
     describe('A frame created without buffer', function () {
         var frame = new h2frame.Http2PingFrame();
@@ -275,7 +514,7 @@ describe('Http2PingFrame:', function () {
         it('should return a string containing frame name', function () {
             assert.notEqual(frame.toString().indexOf('PING'), -1);
         });
-        it('should return a string containing payload informatin', function () {
+        it('should return a string containing payload information', function () {
             assert.notEqual(frame.toString().indexOf('Payload:'), -1);
         });
     });
