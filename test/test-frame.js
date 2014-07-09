@@ -173,7 +173,7 @@ describe('Http2DataFrame:', function () {
         it('should return a string representation of the flags', function () {
             assert.equal(frame.toString().indexOf('END_STREAM'), -1);
             assert.equal(frame.toString().indexOf('END_SEGMENT'), -1);
-            assert.equal(frame.toString().indexOf('END_PADDED'), -1);
+            assert.equal(frame.toString().indexOf('PADDED'), -1);
             frame.flags = h2frame.Http2DataFrame.FLAG_END_STREAM;
             assert.notEqual(frame.toString().indexOf('END_STREAM'), -1);
             frame.flags = h2frame.Http2DataFrame.FLAG_END_SEGMENT;
@@ -466,6 +466,119 @@ describe('Http2SettingsFrame:', function () {
             assert(param);
             assert.equal(param.id, 1);
             assert.equal(param.value, 999);
+        });
+    });
+});
+
+describe('Http2PushPromiseFrame:', function () {
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2PushPromiseFrame();
+        it('should have 4 octets of payload', function () {
+            assert.equal(frame.length, 4);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2PushPromiseFrame();
+        it('should have type value of PUSH_PROMISE frame', function () {
+            assert.equal(frame.type, 5);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2PushPromiseFrame();
+        it('should have no flags', function () {
+            assert.equal(frame.flags, 0);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2PushPromiseFrame();
+        it('should have streamId zero', function () {
+            assert.equal(frame.streamId, 0);
+        });
+    });
+    describe('END_HEADERS', function () {
+        it('should be a constant value for END_HEADERS flag', function () {
+            assert.equal(h2frame.Http2PushPromiseFrame.FLAG_END_HEADERS, 0x4);
+            h2frame.Http2PushPromiseFrame.FLAG_END_HEADERS = 9999;
+            assert.equal(h2frame.Http2PushPromiseFrame.FLAG_END_HEADERS, 0x4);
+        });
+    });
+    describe('PADDED', function () {
+        it('should be a constant value for PADDED flag', function () {
+            assert.equal(h2frame.Http2PushPromiseFrame.FLAG_PADDED, 0x8);
+            h2frame.Http2PushPromiseFrame.FLAG_PADDED = 9999;
+            assert.equal(h2frame.Http2PushPromiseFrame.FLAG_PADDED, 0x8);
+        });
+    });
+    describe('padLength property', function () {
+        var frame = new h2frame.Http2PushPromiseFrame(new Buffer([
+                0x00, 0x09, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04, 0x00]));
+        it('should return length of pad', function () {
+            assert.equal(frame.padLength, 1);
+            frame.setBlock(new Buffer([]), 0);
+            assert.equal(frame.padLength, 0);
+        });
+    });
+    describe('#toString()', function () {
+        var frame = new h2frame.Http2PushPromiseFrame(new Buffer([
+                0x00, 0x06, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x01, 0x00, 0x00, 0x00, 0x00, 0x00]));
+        it('should return a string containing frame name', function () {
+            assert.notEqual(frame.toString().indexOf('PUSH_PROMISE'), -1);
+        });
+        it('should return a string representation of the flags', function () {
+            assert.equal(frame.toString().indexOf('END_HEADERS'), -1);
+            assert.equal(frame.toString().indexOf('PADDED'), -1);
+            frame.flags = h2frame.Http2PushPromiseFrame.FLAG_END_HEADERS;
+            assert.notEqual(frame.toString().indexOf('END_HEADERS'), -1);
+            frame.flags = h2frame.Http2PushPromiseFrame.FLAG_PADDED;
+            assert.notEqual(frame.toString().indexOf('PADDED'), -1);
+        });
+        it('should return a string containing payload information', function () {
+            assert.notEqual(frame.toString().indexOf('Promised Stream ID:'), -1);
+        });
+    });
+    describe('#getBuffer()', function () {
+        var buf = new Buffer([
+            0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04])
+        var frame = new h2frame.Http2PushPromiseFrame(buf);
+        it('should return a buffer, and its length should be sum of frame length plus 8', function () {
+            assert(frame.getBuffer() instanceof Buffer);
+            assert.equal(frame.getBuffer().length, frame.length + 8);
+        });
+        it('should return whole data', function () {
+            assert.deepEqual(frame.getBuffer(), buf);
+        });
+    });
+    describe('#getBlock()', function () {
+        var frame = new h2frame.Http2PushPromiseFrame(new Buffer([
+                0x00, 0x0A, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04, 0x00]));
+        it('should return a buffer, and its length should be same as frame length minus padding length', function () {
+            assert(frame.getBlock() instanceof Buffer);
+            assert.equal(frame.getBlock().length, 4);
+            assert.equal(frame.getBlock().length, frame.length - frame.padLength - 5);
+        });
+        it('should return block part', function () {
+            assert.deepEqual(frame.getBlock(), new Buffer([0x01, 0x02, 0x03, 0x04]));
+        });
+    });
+    describe('#setBlock()', function () {
+        var frame = new h2frame.Http2PushPromiseFrame(new Buffer([
+                0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04]));
+        it('should change block part', function () {
+            var block = new Buffer([0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
+            frame.setBlock(block);
+            assert.deepEqual(frame.getBlock(), block);
+            assert.deepEqual(frame.getBuffer().slice(12), block);
+            frame.setBlock(block, 2);
+            assert.deepEqual(frame.getBlock(), block);
+            assert.deepEqual(frame.getBuffer().slice(13, 19), block);
+            frame.setBlock(block);
+            assert.deepEqual(frame.getBlock(), block);
+            assert.deepEqual(frame.getBuffer().slice(12), block);
         });
     });
 });
