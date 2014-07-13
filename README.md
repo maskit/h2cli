@@ -9,6 +9,7 @@ Status
 
 [![Build Status](https://travis-ci.org/maskit/h2cli.svg?branch=master)](https://travis-ci.org/maskit/h2cli)
 [![Coverage Status](https://img.shields.io/coveralls/maskit/h2cli.svg)](https://coveralls.io/r/maskit/h2cli?branch=master)
+[![Code Climate](https://codeclimate.com/github/maskit/h2cli.png)](https://codeclimate.com/github/maskit/h2cli)
 
 - h2-13 and hpack-08.
 - HTTP/2
