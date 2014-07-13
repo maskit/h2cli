@@ -35,39 +35,47 @@ h2> connect https://twitter.com/
 Connecting to twitter.com:443
 NPN Protocol: h2-13
 h2> send settings
-SEND: [Lenght: 0, Type: SETTINGS(4), Flags: 0, StreamID: 0]
-RECV: [Lenght: 0, Type: SETTINGS(4), Flags: 1, StreamID: 0]
+SEND[0]: [Lenght: 0, Type: SETTINGS(4), Flags: 0, StreamID: 0]
+RECV[0]: [Lenght: 0, Type: SETTINGS(4), Flags: 1, StreamID: 0]
  Flags: ACK
-RECV: [Lenght: 6, Type: SETTINGS(4), Flags: 0, StreamID: 0]
+RECV[0]: [Lenght: 6, Type: SETTINGS(4), Flags: 0, StreamID: 0]
  Params:
   SETTINGS_MAX_CONCURRENT_STREAMS: 100
-SEND: [Lenght: 0, Type: SETTINGS(4), Flags: 1, StreamID: 0]
+SEND[0]: [Lenght: 0, Type: SETTINGS(4), Flags: 1, StreamID: 0]
  Flags: ACK
 
 h2> head /
-SEND: [Lenght: 22, Type: HEADERS(1), Flags: 5, StreamID: 1]
+SEND[1]: [Lenght: 35, Type: HEADERS(1), Flags: 5, StreamID: 1]
  Flags: END_STREAM | END_HEADERS
-RECV: [Lenght: 678, Type: HEADERS(1), Flags: 5, StreamID: 1]
+STATE CHANGE[1]: IDLE -> HARF CLOSED (LOCAL)
+RECV[1]: [Lenght: 679, Type: HEADERS(1), Flags: 5, StreamID: 1]
  Flags: END_STREAM | END_HEADERS
+STATE CHANGE[1]: HARF CLOSED (LOCAL) -> CLOSED
 [ [ ':status', '200' ],
   [ 'cache-control',
     'no-cache, no-store, must-revalidate, pre-check=0, post-check=0' ],
-  [ 'content-length', '52189' ],
+  [ 'content-length', '54506' ],
   [ 'content-type', 'text/html;charset=utf-8' ],
-  [ 'date', 'Sat, 28 Jun 2014 11:29:25 GMT' ],
+  [ 'date', 'Sun, 13 Jul 2014 06:33:46 GMT' ],
   [ 'expires', 'Tue, 31 Mar 1981 05:00:00 GMT' ],
-  [ 'last-modified', 'Sat, 28 Jun 2014 11:29:25 GMT' ],
+  [ 'last-modified', 'Sun, 13 Jul 2014 06:33:46 GMT' ],
   [ 'ms', 'S' ],
   [ 'pragma', 'no-cache' ],
   [ 'server', 'tfe' ],
   [ 'set-cookie',
-    'goth=1\u0000_twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlN2JhYzBhZGZhMTA2MDRhNDc0%250AZmNiZDYyNWYzNGM0YjI6D2NyZWF0ZWRfYXRsKwjHrTziRgE6B2lkIiU4YjJk%250AYTRjZjdkMmFlZGE0NWQzZDQzN2E2ODA4ZGM1Yw%253D%253D--c3c844c6010082ddbacd5930f05717937e870481; Path=/; Domain=.twitter.com; Secure; HTTPOnly\u0000guest_id=v1%3A140395496595882697; Domain=.twitter.com; Path=/; Expires=Mon, 27-Jun-2016 11:29:25 UTC' ],
+    'goth=1\u0000_twitter_sess=BAh7CSIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo%250ASGFzaHsABjoKQHVzZWR7ADoPY3JlYXRlZF9hdGwrCN9kbS5HAToMY3NyZl9p%250AZCIlMDM1NjdiNmI1OGRlOTEyYWUzYWU0NmE5OWVhZGU0ZmE6B2lkIiVlZjgy%250ANGNjN2QwM2QwMDcyZDA2ZTk5MDg4MzhmOWFiOA%253D%253D--64b935a3b1fa311d4a231a03b19a9c407d6d9669; Path=/; Domain=.twitter.com; Secure; HTTPOnly\u0000guest_id=v1%3A140523322695692534; Domain=.twitter.com; Path=/; Expires=Tue, 12-Jul-2016 06:33:46 UTC' ],
   [ 'status', '200 OK' ],
   [ 'strict-transport-security', 'max-age=631138519' ],
   [ 'x-content-type-options', 'nosniff' ],
   [ 'x-frame-options', 'SAMEORIGIN' ],
-  [ 'x-transaction', 'f0f5bf06658d009f' ],
+  [ 'x-transaction', '3f579f2a1c22c94b' ],
   [ 'x-ua-compatible', 'IE=edge,chrome=1' ],
   [ 'x-xss-protection', '1; mode=block' ] ]
+h2> show s
+settings  streams
+
+h2> show streams
+Stream #0, State: IDLE, Bytes Sent: 16, Bytes Received: 22
+Stream #1, State: CLOSED, Bytes Sent: 43, Bytes Received: 687
 h2> 
 ```
