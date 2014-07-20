@@ -1,4 +1,5 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
+
 var fs = require('fs');
 var path = require('path');
 var h2 = require('./lib/h2');
