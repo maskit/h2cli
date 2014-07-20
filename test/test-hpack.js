@@ -3,9 +3,10 @@ var fs = require('fs');
 var HPACK = require('../lib/hpack').HPACK;
 
 function convertForInput(headers) {
-    var i, n, entry, converted = [];
+    var i, n, keys, converted = [];
     for (i = 0; i < headers.length; i++) {
-        converted.push([Object.keys(headers[i])[0], headers[i][Object.keys(headers[i])[0]]]);
+        keys = Object.keys(headers[i]);
+        converted.push([keys[0], headers[i][keys[0]]]);
     }
     return converted;
 };
@@ -30,12 +31,13 @@ function isSame (actual, expected) {
 };
 
 function convertForCompare(headers) {
-    var i, n, entry, converted = {};
+    var i, n, keys, converted = {};
     for (i = 0; i < headers.length; i++) {
         if (headers[i] instanceof Array) {
             converted[headers[i][0]] = headers[i][1];
         } else {
-            converted[Object.keys(headers[i])[0]] = headers[i][Object.keys(headers[i])[0]];
+            keys = Object.keys(headers[i]);
+            converted[keys[0]] = headers[i][keys[0]];
         }
     }
     return converted;
