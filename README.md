@@ -18,7 +18,7 @@ Status
 - HPACK
     - Passes all (#00 to 31) test stories in [http2jp/hpack-test-case](https://github.com/http2jp/hpack-test-case/)
         - Decoder can interpret wire data of nghttp2 and hyper-hpack.
-        - Encoder works, but the implementation never use 'without Indexing', 'never Indexed' nor huffman encoding.
+        - Encoder works, but the implementation never use 'without Indexing', 'never Indexed'.
 - Source code
     - Smells bad.
 
