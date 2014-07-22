@@ -16,9 +16,10 @@ function isSame (actual, expected) {
     if (actual.length !== expected.length) {
         return false;
     }
+    n = expected.length;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-            if (actulal[i][0] === expected[j][0] && actual[i][1] === expected[j][1]) {
+            if (actual[i][0] === expected[j][0] && actual[i][1] === expected[j][1]) {
                 break;
             }
         }
