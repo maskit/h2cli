@@ -118,6 +118,13 @@ describe('Http2DataFrame:', function () {
             assert.deepEqual(frame.getBuffer(), buf);
         });
     });
+    describe('TYPE_CODE', function () {
+        it('should be a constant value for type code', function () {
+            assert.equal(h2frame.Http2DataFrame.TYPE_CODE, 0x0);
+            h2frame.Http2DataFrame.FLAG_END_STREAM = 9999;
+            assert.equal(h2frame.Http2DataFrame.TYPE_CODE, 0x0);
+        });
+    });
     describe('FLAG_END_STREAM', function () {
         it('should be a constant value for END_STREAM flag', function () {
             assert.equal(h2frame.Http2DataFrame.FLAG_END_STREAM, 0x1);
