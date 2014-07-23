@@ -509,6 +509,13 @@ describe('Http2PushPromiseFrame:', function () {
             assert.equal(frame.streamId, 0);
         });
     });
+    describe('TYPE_CODE', function () {
+        it('should be a constant value for type code', function () {
+            assert.equal(h2frame.Http2PushPromiseFrame.TYPE_CODE, 0x5);
+            h2frame.Http2DataFrame.FLAG_END_STREAM = 9999;
+            assert.equal(h2frame.Http2PushPromiseFrame.TYPE_CODE, 0x5);
+        });
+    });
     describe('END_HEADERS', function () {
         it('should be a constant value for END_HEADERS flag', function () {
             assert.equal(h2frame.Http2PushPromiseFrame.FLAG_END_HEADERS, 0x4);
