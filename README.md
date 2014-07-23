@@ -3,6 +3,11 @@ h2cli
 
 A command line interface for HTTP/2
 
+Documents
+---------
+
+The [documents](http://h2cli.readthedocs.org/en/latest/) are on Read the Docs.
+
 
 Status
 ------
