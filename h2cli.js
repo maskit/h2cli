@@ -19,7 +19,7 @@ config = JSON.parse(configData);
 var h2client = h2.createClient(config); 
 
 // Load commands
-cmd.loadCommands(h2client, path.resolve('./lib/cmd'));
+cmd.loadCommands(h2client, __dirname + '/lib/cmd');
 if (fs.existsSync(homeDir + '/.h2cli/cmd')) {
     cmd.loadCommands(h2client, homeDir + '/.h2cli/cmd');
 }

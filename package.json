@@ -1,7 +1,7 @@
 {
   "name": "h2cli",
   "description": "A command line interface for HTTP/2",
-  "version": "0.13.8",
+  "version": "0.13.9",
   "bin": {
     "h2cli": "./h2cli.js"
   },
