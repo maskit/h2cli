@@ -14,6 +14,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   howto/index.rst
    command/index.rst
    config/index.rst
 
