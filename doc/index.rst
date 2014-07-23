@@ -15,4 +15,5 @@ Contents:
    :maxdepth: 2
 
    command/index.rst
+   config/index.rst
 
