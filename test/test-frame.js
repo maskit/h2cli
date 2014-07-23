@@ -636,6 +636,13 @@ describe('Http2PingFrame:', function () {
             assert.deepEqual(frame.getBuffer(), buf);
         });
     });
+    describe('TYPE_CODE', function () {
+        it('should be a constant value for type code', function () {
+            assert.equal(h2frame.Http2PingFrame.TYPE_CODE, 0x6);
+            h2frame.Http2DataFrame.FLAG_END_STREAM = 9999;
+            assert.equal(h2frame.Http2PingFrame.TYPE_CODE, 0x6);
+        });
+    });
     describe('FLAG_ACK', function () {
         it('should be a constant value for ACK flag', function () {
             assert.equal(h2frame.Http2PingFrame.FLAG_ACK, 0x1);
