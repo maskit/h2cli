@@ -238,6 +238,78 @@ describe('Http2DataFrame:', function () {
     });
 });
 
+describe('Http2RstStreamFrame:', function () {
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2RstStreamFrame();
+        it('should have 4 octets of payload', function () {
+            assert.equal(frame.length, 4);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2RstStreamFrame();
+        it('should have type value of SETTINGS frame', function () {
+            assert.equal(frame.type, 3);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2RstStreamFrame();
+        it('should have no flags', function () {
+            assert.equal(frame.flags, 0);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2RstStreamFrame();
+        it('should have streamId zero', function () {
+            assert.equal(frame.streamId, 0);
+        });
+    });
+    describe('A frame created with buffer', function () {
+        var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C]);
+        var frame = new h2frame.Http2RstStreamFrame(buf);
+        it('should have same data', function () {
+            assert.deepEqual(frame.getBuffer(), buf);
+        });
+    });
+    describe('TYPE_CODE', function () {
+        it('should be a constant value for type code', function () {
+            assert.equal(h2frame.Http2RstStreamFrame.TYPE_CODE, 0x3);
+            h2frame.Http2RstStreamFrame.FLAG_END_STREAM = 9999;
+            assert.equal(h2frame.Http2RstStreamFrame.TYPE_CODE, 0x3);
+        });
+    });
+    describe('errorCode property', function () {
+        var frame;
+        it('should be the error code', function () {
+            frame = new h2frame.Http2RstStreamFrame();
+            assert.equal(frame.errorCode, 0);
+            frame = new h2frame.Http2RstStreamFrame(new Buffer([
+                    0x00, 0x04, 0x03, 0x00, 0x00, 0x0, 0x00, 0x00,
+                    0xFF, 0xFF, 0xFF, 0xFF
+                    ]));
+            assert.equal(frame.errorCode, 4294967295);
+        });
+    });
+    describe('#toString()', function () {
+        var frame = new h2frame.Http2RstStreamFrame();
+        it('should return a string containing frame name', function () {
+            assert.notEqual(frame.toString().indexOf('RST_STREAM'), -1);
+        });
+        it('should return a string representation of the error code', function () {
+            assert.notEqual(frame.toString().indexOf('Error Code:'), -1);
+        });
+    });
+    describe('#getBuffer()', function () {
+        var frame;
+        beforeEach(function () {
+            frame = new h2frame.Http2RstStreamFrame();
+        });
+        it('should return a buffer, and its length should be 12 octets.', function () {
+            assert(frame.getBuffer() instanceof Buffer);
+            assert.equal(frame.getBuffer().length, 12);
+        });
+    });
+});
+
 describe('Http2SettingsFrame:', function () {
     describe('A frame created without buffer', function () {
         var frame = new h2frame.Http2SettingsFrame();
