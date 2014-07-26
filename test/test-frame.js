@@ -2,12 +2,14 @@ var assert = require("assert")
 var fs = require('fs');
 var h2frame = require('../lib/frame');
 
+var FRAME_HEADER_SIZE = 8;
+
 describe('Http2Frame:', function () {
     describe('HEADER_SIZE', function () {
         it('should be a constant value for header size', function () {
-            assert.equal(h2frame.Http2Frame.HEADER_SIZE, 8);
+            assert.equal(h2frame.Http2Frame.HEADER_SIZE, FRAME_HEADER_SIZE);
             h2frame.Http2PingFrame.FLAG_ACK = 9999;
-            assert.equal(h2frame.Http2Frame.HEADER_SIZE, 8);
+            assert.equal(h2frame.Http2Frame.HEADER_SIZE, FRAME_HEADER_SIZE);
         });
     });
     describe('length property', function () {
@@ -198,9 +200,9 @@ describe('Http2DataFrame:', function () {
             0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
         var frame = new h2frame.Http2DataFrame(buf);
-        it('should return a buffer, and its length should be sum of frame length plus 8', function () {
+        it('should return a buffer, and its length should be sum of frame length plus header size', function () {
             assert(frame.getBuffer() instanceof Buffer);
-            assert.equal(frame.getBuffer().length, frame.length + 8);
+            assert.equal(frame.getBuffer().length, frame.length + FRAME_HEADER_SIZE);
         });
         it('should return whole data', function () {
             assert.deepEqual(frame.getBuffer(), buf);
@@ -227,13 +229,13 @@ describe('Http2DataFrame:', function () {
             var data = new Buffer([0x0A, 0x0B, 0x0C, 0x0D]);
             frame.setData(data);
             assert.deepEqual(frame.getData(), data);
-            assert.deepEqual(frame.getBuffer().slice(8), data);
+            assert.deepEqual(frame.getBuffer().slice(FRAME_HEADER_SIZE), data);
             frame.setData(data, 2);
             assert.deepEqual(frame.getData(), data);
-            assert.deepEqual(frame.getBuffer().slice(9, 13), data);
+            assert.deepEqual(frame.getBuffer().slice(FRAME_HEADER_SIZE + 1, FRAME_HEADER_SIZE + 5), data);
             frame.setData(data);
             assert.deepEqual(frame.getData(), data);
-            assert.deepEqual(frame.getBuffer().slice(8), data);
+            assert.deepEqual(frame.getBuffer().slice(FRAME_HEADER_SIZE), data);
         });
     });
 });
@@ -354,18 +356,18 @@ describe('Http2HeadersFrame:', function () {
         });
     });
     describe('#getBuffer()', function () {
-        it('should return a buffer, and its length should be 8 octets if there are no header blocks.', function () {
+        it('should return a buffer, and its length should be same as header size  if there are no header blocks.', function () {
             var frame = new h2frame.Http2HeadersFrame();
             assert(frame.getBuffer() instanceof Buffer);
-            assert.equal(frame.getBuffer().length, 8);
+            assert.equal(frame.getBuffer().length, FRAME_HEADER_SIZE);
         });
-        it('should return a buffer, and its length should be 8 + block size.', function () {
+        it('should return a buffer, and its length should be header size + block size.', function () {
             var frame = new h2frame.Http2HeadersFrame(new Buffer([
                     0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x01, 0x02, 0x03, 0x04
                     ]));
             assert(frame.getBuffer() instanceof Buffer);
-            assert.equal(frame.getBuffer().length, 8 + 4);
+            assert.equal(frame.getBuffer().length, FRAME_HEADER_SIZE + 4);
         });
     });
     describe('#getBlock', function () {
@@ -584,20 +586,20 @@ describe('Http2SettingsFrame:', function () {
         beforeEach(function () {
             frame = new h2frame.Http2SettingsFrame();
         });
-        it('should return a buffer, and its length should be 8 octets if there are no params.', function () {
+        it('should return a buffer, and its length should be header size if there are no params.', function () {
             assert(frame.getBuffer() instanceof Buffer);
-            assert.equal(frame.getBuffer().length, 8);
+            assert.equal(frame.getBuffer().length, FRAME_HEADER_SIZE);
         });
-        it('should return a buffer, and its length should be 16 octets if there is one params.', function () {
+        it('should return a buffer, and its length should be header size + 6 octets if there is one params.', function () {
             frame.setParam(1, 100);
             assert(frame.getBuffer() instanceof Buffer);
-            assert.equal(frame.getBuffer().length, 14);
+            assert.equal(frame.getBuffer().length, FRAME_HEADER_SIZE + 6);
         });
-        it('should return a buffer, and its length should be 24 octets if there is two params.', function () {
+        it('should return a buffer, and its length should be header size + 12 octets if there is two params.', function () {
             frame.setParam(1, 100);
             frame.setParam(2, 100);
             assert(frame.getBuffer() instanceof Buffer);
-            assert.equal(frame.getBuffer().length, 20);
+            assert.equal(frame.getBuffer().length, FRAME_HEADER_SIZE + 12);
         });
     });
     describe('#getParamCount()', function () {
@@ -808,9 +810,9 @@ describe('Http2PushPromiseFrame:', function () {
             0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04])
         var frame = new h2frame.Http2PushPromiseFrame(buf);
-        it('should return a buffer, and its length should be sum of frame length plus 8', function () {
+        it('should return a buffer, and its length should be sum of frame length plus header size', function () {
             assert(frame.getBuffer() instanceof Buffer);
-            assert.equal(frame.getBuffer().length, frame.length + 8);
+            assert.equal(frame.getBuffer().length, frame.length + FRAME_HEADER_SIZE);
         });
         it('should return whole data', function () {
             assert.deepEqual(frame.getBuffer(), buf);
@@ -923,7 +925,7 @@ describe('Http2PingFrame:', function () {
             var expected = new Buffer([0x11, 0x22, 0x33, 0x44, 0xAA, 0xBB, 0xCC, 0xDD]);
             frame.setPayload(expected);
             assert.deepEqual(frame.getPayload(), expected);
-            assert.deepEqual(frame.getBuffer().slice(8, 16), expected);
+            assert.deepEqual(frame.getBuffer().slice(FRAME_HEADER_SIZE, FRAME_HEADER_SIZE + 8), expected);
         });
     });
 });
