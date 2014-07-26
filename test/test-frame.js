@@ -238,6 +238,178 @@ describe('Http2DataFrame:', function () {
     });
 });
 
+describe('Http2HeadersFrame:', function () {
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2HeadersFrame();
+        it('should have 0 octets of payload', function () {
+            assert.equal(frame.length, 0);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2HeadersFrame();
+        it('should have type value of HEADERS frame', function () {
+            assert.equal(frame.type, 1);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2HeadersFrame();
+        it('should have no flags', function () {
+            assert.equal(frame.flags, 0);
+        });
+    });
+    describe('A frame created without buffer', function () {
+        var frame = new h2frame.Http2HeadersFrame();
+        it('should have streamId zero', function () {
+            assert.equal(frame.streamId, 0);
+        });
+    });
+    describe('A frame created with buffer', function () {
+        var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E]);
+        var frame = new h2frame.Http2HeadersFrame(buf);
+        it('should have same data', function () {
+            assert.deepEqual(frame.getBuffer(), buf);
+        });
+    });
+    describe('TYPE_CODE', function () {
+        it('should be a constant value for type code', function () {
+            assert.equal(h2frame.Http2HeadersFrame.TYPE_CODE, 0x1);
+            h2frame.Http2HeadersFrame.TYPE_CODE= 9999;
+            assert.equal(h2frame.Http2HeadersFrame.TYPE_CODE, 0x1);
+        });
+    });
+    describe('FLAG_END_STREAM', function () {
+        it('should be a constant value for END_STREAM flag', function () {
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_END_STREAM, 0x1);
+            h2frame.Http2HeadersFrame.FLAG_END_STREAM = 9999;
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_END_STREAM, 0x1);
+        });
+    });
+    describe('FLAG_END_SEGMENT', function () {
+        it('should be a constant value for END_SEGMENT flag', function () {
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_END_SEGMENT, 0x2);
+            h2frame.Http2HeadersFrame.FLAG_END_SEGMENT = 9999;
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_END_SEGMENT, 0x2);
+        });
+    });
+    describe('FLAG_END_HEADERS', function () {
+        it('should be a constant value for END_HEADERS flag', function () {
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_END_HEADERS, 0x4);
+            h2frame.Http2HeadersFrame.FLAG_HEADERS = 9999;
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_END_HEADERS, 0x4);
+        });
+    });
+    describe('FLAG_PADDED', function () {
+        it('should be a constant value for PADDED flag', function () {
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_PADDED, 0x8);
+            h2frame.Http2HeadersFrame.FLAG_PADDED = 9999;
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_PADDED, 0x8);
+        });
+    });
+    describe('FLAG_PRIORITY', function () {
+        it('should be a constant value for PRIORITY flag', function () {
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_PRIORITY, 0x20);
+            h2frame.Http2HeadersFrame.FLAG_PRIORITY = 9999;
+            assert.equal(h2frame.Http2HeadersFrame.FLAG_PRIORITY, 0x20);
+        });
+    });
+    describe('#toString()', function () {
+        var frame = new h2frame.Http2HeadersFrame();
+        it('should return a string containing frame name', function () {
+            assert.notEqual(frame.toString().indexOf('HEADERS'), -1);
+        });
+        it('should return a string representation of the flags', function () {
+            assert.equal(frame.toString().indexOf('END_STREAM'), -1);
+            frame.flags = h2frame.Http2HeadersFrame.FLAG_END_STREAM;
+            assert.notEqual(frame.toString().indexOf('END_STREAM'), -1);
+        });
+        it('should return a string representation of the flags', function () {
+            assert.equal(frame.toString().indexOf('END_SEGMENT'), -1);
+            frame.flags = h2frame.Http2HeadersFrame.FLAG_END_SEGMENT;
+            assert.notEqual(frame.toString().indexOf('END_SEGMENT'), -1);
+        });
+        it('should return a string representation of the flags', function () {
+            assert.equal(frame.toString().indexOf('END_HEADERS'), -1);
+            frame.flags = h2frame.Http2HeadersFrame.FLAG_END_HEADERS;
+            assert.notEqual(frame.toString().indexOf('END_HEADERS'), -1);
+        });
+        it('should return a string representation of the flags', function () {
+            assert.equal(frame.toString().indexOf('PADDED'), -1);
+            frame.flags = h2frame.Http2HeadersFrame.FLAG_PADDED;
+            assert.notEqual(frame.toString().indexOf('PADDED'), -1);
+        });
+        it('should return a string representation of the flags', function () {
+            assert.equal(frame.toString().indexOf('PRIORITY'), -1);
+            frame.flags = h2frame.Http2HeadersFrame.FLAG_PRIORITY;
+            assert.notEqual(frame.toString().indexOf('PRIORITY'), -1);
+        });
+    });
+    describe('padLength property', function () {
+        var frame = new h2frame.Http2HeadersFrame(new Buffer([
+                0x00, 0x07, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x01, 0x02, 0x03, 0x04, 0x00]));
+        it('should return length of pad', function () {
+            assert.equal(frame.padLength, 1);
+            frame.setBlock(new Buffer([]), 0);
+            assert.equal(frame.padLength, 0);
+        });
+    });
+    describe('#getBuffer()', function () {
+        it('should return a buffer, and its length should be 8 octets if there are no header blocks.', function () {
+            var frame = new h2frame.Http2HeadersFrame();
+            assert(frame.getBuffer() instanceof Buffer);
+            assert.equal(frame.getBuffer().length, 8);
+        });
+        it('should return a buffer, and its length should be 8 + block size.', function () {
+            var frame = new h2frame.Http2HeadersFrame(new Buffer([
+                    0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x01, 0x02, 0x03, 0x04
+                    ]));
+            assert(frame.getBuffer() instanceof Buffer);
+            assert.equal(frame.getBuffer().length, 8 + 4);
+        });
+    });
+    describe('#getBlock', function () {
+        var frame = new h2frame.Http2HeadersFrame(new Buffer([
+                0x00, 0x06, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x01, 0x02, 0x03, 0x04, 0x00]));
+        it('should return a buffer, and its length should be same as frame length minus padding length', function () {
+            assert(frame.getBlock() instanceof Buffer);
+            assert.equal(frame.getBlock().length, 4);
+            assert.equal(frame.getBlock().length, frame.length - frame.padLength - 1);
+        });
+        it('should return block part', function () {
+            assert.deepEqual(frame.getBlock(), new Buffer([0x01, 0x02, 0x03, 0x04]));
+        });
+    });
+    describe('#setBlock', function () {
+        var frame;
+        beforeEach(function () {
+            frame = new h2frame.Http2HeadersFrame();
+        });
+        it('should set header block data', function () {
+            frame.setBlock(new Buffer([0x01, 0x02, 0x03, 0x04]));
+            assert.deepEqual(new Buffer([
+                    0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x01, 0x02, 0x03, 0x04
+                    ]), frame.getBuffer());
+            assert.deepEqual(new Buffer([
+                    0x01, 0x02, 0x03, 0x04
+                    ]), frame.getBlock());
+        });
+        it('should set header block data with padding', function () {
+            frame.setBlock(new Buffer([0x01, 0x02, 0x03, 0x04]), 2);
+            assert.deepEqual(new Buffer([
+                    0x00, 0x07, 0x01, 0x08, 0x00, 0x00, 0x00, 0x00, 0x02,
+                    0x01, 0x02, 0x03, 0x04, 0x00, 0x00, 
+                    ]), frame.getBuffer());
+            assert.deepEqual(new Buffer([
+                    0x01, 0x02, 0x03, 0x04
+                    ]), frame.getBlock());
+            
+        });
+    });
+});
+
 describe('Http2RstStreamFrame:', function () {
     describe('A frame created without buffer', function () {
         var frame = new h2frame.Http2RstStreamFrame();
