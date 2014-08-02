@@ -16,13 +16,13 @@ Status
 [![Coverage Status](https://img.shields.io/coveralls/maskit/h2cli.svg)](https://coveralls.io/r/maskit/h2cli?branch=master)
 [![Code Climate](https://codeclimate.com/github/maskit/h2cli.png)](https://codeclimate.com/github/maskit/h2cli)
 
-- h2-13 and hpack-08.
+- h2-13 and hpack-09.
 - HTTP/2
     - Stream priority is not implemented yet.
     - No error handlings.
 - HPACK
     - Passes all (#00 to 31) test stories in [http2jp/hpack-test-case](https://github.com/http2jp/hpack-test-case/)
-        - Decoder can interpret wire data of nghttp2 and hyper-hpack.
+        - Decoder can interpret wire data of nghttp2.
         - Encoder works, but the implementation never use 'without Indexing', 'never Indexed'.
 - Source code
     - Smells bad.
