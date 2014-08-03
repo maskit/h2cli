@@ -136,13 +136,6 @@ describe('Http2DataFrame:', function () {
             assert.equal(h2frame.Http2DataFrame.FLAG_END_STREAM, 0x1);
         });
     });
-    describe('FLAG_END_SEGMENT', function () {
-        it('should be a constant value for END_SEGMENT flag', function () {
-            assert.equal(h2frame.Http2DataFrame.FLAG_END_SEGMENT, 0x2);
-            h2frame.Http2DataFrame.FLAG_END_SEGMENT = 9999;
-            assert.equal(h2frame.Http2DataFrame.FLAG_END_SEGMENT, 0x2);
-        });
-    });
     describe('FLAG_PADDED', function () {
         it('should be a constant value for PADDED flag', function () {
             assert.equal(h2frame.Http2DataFrame.FLAG_PADDED, 0x8);
@@ -183,12 +176,9 @@ describe('Http2DataFrame:', function () {
         });
         it('should return a string representation of the flags', function () {
             assert.equal(frame.toString().indexOf('END_STREAM'), -1);
-            assert.equal(frame.toString().indexOf('END_SEGMENT'), -1);
             assert.equal(frame.toString().indexOf('PADDED'), -1);
             frame.flags = h2frame.Http2DataFrame.FLAG_END_STREAM;
             assert.notEqual(frame.toString().indexOf('END_STREAM'), -1);
-            frame.flags = h2frame.Http2DataFrame.FLAG_END_SEGMENT;
-            assert.notEqual(frame.toString().indexOf('END_SEGMENT'), -1);
             frame.flags = h2frame.Http2DataFrame.FLAG_PADDED;
             assert.notEqual(frame.toString().indexOf('PADDED'), -1);
         });
@@ -288,13 +278,6 @@ describe('Http2HeadersFrame:', function () {
             assert.equal(h2frame.Http2HeadersFrame.FLAG_END_STREAM, 0x1);
         });
     });
-    describe('FLAG_END_SEGMENT', function () {
-        it('should be a constant value for END_SEGMENT flag', function () {
-            assert.equal(h2frame.Http2HeadersFrame.FLAG_END_SEGMENT, 0x2);
-            h2frame.Http2HeadersFrame.FLAG_END_SEGMENT = 9999;
-            assert.equal(h2frame.Http2HeadersFrame.FLAG_END_SEGMENT, 0x2);
-        });
-    });
     describe('FLAG_END_HEADERS', function () {
         it('should be a constant value for END_HEADERS flag', function () {
             assert.equal(h2frame.Http2HeadersFrame.FLAG_END_HEADERS, 0x4);
@@ -325,11 +308,6 @@ describe('Http2HeadersFrame:', function () {
             assert.equal(frame.toString().indexOf('END_STREAM'), -1);
             frame.flags = h2frame.Http2HeadersFrame.FLAG_END_STREAM;
             assert.notEqual(frame.toString().indexOf('END_STREAM'), -1);
-        });
-        it('should return a string representation of the flags', function () {
-            assert.equal(frame.toString().indexOf('END_SEGMENT'), -1);
-            frame.flags = h2frame.Http2HeadersFrame.FLAG_END_SEGMENT;
-            assert.notEqual(frame.toString().indexOf('END_SEGMENT'), -1);
         });
         it('should return a string representation of the flags', function () {
             assert.equal(frame.toString().indexOf('END_HEADERS'), -1);
