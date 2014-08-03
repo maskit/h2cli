@@ -2,7 +2,7 @@ var assert = require("assert")
 var fs = require('fs');
 var h2frame = require('../lib/frame');
 
-var FRAME_HEADER_SIZE = 8;
+var FRAME_HEADER_SIZE = 9;
 
 describe('Http2Frame:', function () {
     describe('HEADER_SIZE', function () {
@@ -15,16 +15,18 @@ describe('Http2Frame:', function () {
     describe('length property', function () {
         it('should be the length of payload', function () {
             var frame;
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.length, 0);
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.length, 1);
-            frame = new h2frame.Http2Frame(new Buffer([0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.length, 256);
-            frame = new h2frame.Http2Frame(new Buffer([0x3F, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x3F, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.length, 16383);
-            frame = new h2frame.Http2Frame(new Buffer([0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
-            assert.equal(frame.length, 0);
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            assert.equal(frame.length, 16384);
+            frame = new h2frame.Http2Frame(new Buffer([0x80, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            assert.equal(frame.length, 8388863);
         });
         it('should be writable', function () {
             var frame;
@@ -37,14 +39,14 @@ describe('Http2Frame:', function () {
     describe('type property', function () {
         it('should be the type of frame', function () {
             var frame;
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.type, 1);
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.type, 255);
         });
         it('should be writable', function () {
             var frame;
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.type, 0);
             frame.type = 99;
             assert.equal(frame.type, 99);
@@ -53,14 +55,14 @@ describe('Http2Frame:', function () {
     describe('flags property', function () {
         it('should be the flags which the frame has', function () {
             var frame;
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.flags, 0x01);
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.flags, 0xFF);
         });
         it('should be writable', function () {
             var frame;
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.flags, 0);
             frame.flags |= 0xFF;
             assert.equal(frame.flags, 0xFF);
@@ -69,18 +71,18 @@ describe('Http2Frame:', function () {
     describe('streamId property', function () {
         it('should be the streamId of the frame', function () {
             var frame;
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.streamId, 0);
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]));
             assert.equal(frame.streamId, 1);
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x7F, 0xFF, 0xFF, 0xFF]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x7F, 0xFF, 0xFF, 0xFF]));
             assert.equal(frame.streamId, Math.pow(2, 31) -1);
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF]));
             assert.equal(frame.streamId, Math.pow(2, 31) -1);
         });
         it('should be writable', function () {
             var frame;
-            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+            frame = new h2frame.Http2Frame(new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.streamId, 0);
             frame.streamId = 99999;
             assert.equal(frame.streamId, 99999);
@@ -114,7 +116,7 @@ describe('Http2DataFrame:', function () {
         });
     });
     describe('A frame created with buffer', function () {
-        var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]);
+        var buf = new Buffer([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]);
         var frame = new h2frame.Http2DataFrame(buf);
         it('should have same data', function () {
             assert.deepEqual(frame.getBuffer(), buf);
@@ -161,7 +163,7 @@ describe('Http2DataFrame:', function () {
     });
     describe('padLength property', function () {
         var frame = new h2frame.Http2DataFrame(new Buffer([
-                0x00, 0x0A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x0A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
                 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x00]));
         it('should return length of pad', function () {
             assert.equal(frame.padLength, 1);
@@ -197,7 +199,7 @@ describe('Http2DataFrame:', function () {
     });
     describe('#getBuffer()', function () {
         var buf = new Buffer([
-            0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08])
         var frame = new h2frame.Http2DataFrame(buf);
         it('should return a buffer, and its length should be sum of frame length plus header size', function () {
@@ -210,7 +212,7 @@ describe('Http2DataFrame:', function () {
     });
     describe('#getData()', function () {
         var frame = new h2frame.Http2DataFrame(new Buffer([
-                0x00, 0x0A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x0A, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
                 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x00]));
         it('should return a buffer, and its length should be same as frame length minus padding length', function () {
             assert(frame.getData() instanceof Buffer);
@@ -223,7 +225,7 @@ describe('Http2DataFrame:', function () {
     });
     describe('#setData()', function () {
         var frame = new h2frame.Http2DataFrame(new Buffer([
-                0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]));
         it('should change data part', function () {
             var data = new Buffer([0x0A, 0x0B, 0x0C, 0x0D]);
@@ -266,7 +268,7 @@ describe('Http2HeadersFrame:', function () {
         });
     });
     describe('A frame created with buffer', function () {
-        var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E]);
+        var buf = new Buffer([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E]);
         var frame = new h2frame.Http2HeadersFrame(buf);
         it('should have same data', function () {
             assert.deepEqual(frame.getBuffer(), buf);
@@ -347,7 +349,7 @@ describe('Http2HeadersFrame:', function () {
     });
     describe('padLength property', function () {
         var frame = new h2frame.Http2HeadersFrame(new Buffer([
-                0x00, 0x07, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x07, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
                 0x01, 0x02, 0x03, 0x04, 0x00]));
         it('should return length of pad', function () {
             assert.equal(frame.padLength, 1);
@@ -363,7 +365,7 @@ describe('Http2HeadersFrame:', function () {
         });
         it('should return a buffer, and its length should be header size + block size.', function () {
             var frame = new h2frame.Http2HeadersFrame(new Buffer([
-                    0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x01, 0x02, 0x03, 0x04
                     ]));
             assert(frame.getBuffer() instanceof Buffer);
@@ -372,7 +374,7 @@ describe('Http2HeadersFrame:', function () {
     });
     describe('#getBlock', function () {
         var frame = new h2frame.Http2HeadersFrame(new Buffer([
-                0x00, 0x06, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x06, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
                 0x01, 0x02, 0x03, 0x04, 0x00]));
         it('should return a buffer, and its length should be same as frame length minus padding length', function () {
             assert(frame.getBlock() instanceof Buffer);
@@ -391,7 +393,7 @@ describe('Http2HeadersFrame:', function () {
         it('should set header block data', function () {
             frame.setBlock(new Buffer([0x01, 0x02, 0x03, 0x04]));
             assert.deepEqual(new Buffer([
-                    0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x01, 0x02, 0x03, 0x04
                     ]), frame.getBuffer());
             assert.deepEqual(new Buffer([
@@ -401,7 +403,7 @@ describe('Http2HeadersFrame:', function () {
         it('should set header block data with padding', function () {
             frame.setBlock(new Buffer([0x01, 0x02, 0x03, 0x04]), 2);
             assert.deepEqual(new Buffer([
-                    0x00, 0x07, 0x01, 0x08, 0x00, 0x00, 0x00, 0x00, 0x02,
+                    0x00, 0x00, 0x07, 0x01, 0x08, 0x00, 0x00, 0x00, 0x00, 0x02,
                     0x01, 0x02, 0x03, 0x04, 0x00, 0x00, 
                     ]), frame.getBuffer());
             assert.deepEqual(new Buffer([
@@ -438,7 +440,7 @@ describe('Http2RstStreamFrame:', function () {
         });
     });
     describe('A frame created with buffer', function () {
-        var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C]);
+        var buf = new Buffer([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C]);
         var frame = new h2frame.Http2RstStreamFrame(buf);
         it('should have same data', function () {
             assert.deepEqual(frame.getBuffer(), buf);
@@ -457,7 +459,7 @@ describe('Http2RstStreamFrame:', function () {
             frame = new h2frame.Http2RstStreamFrame();
             assert.equal(frame.errorCode, 0);
             frame = new h2frame.Http2RstStreamFrame(new Buffer([
-                    0x00, 0x04, 0x03, 0x00, 0x00, 0x0, 0x00, 0x00,
+                    0x00, 0x00, 0x04, 0x03, 0x00, 0x00, 0x0, 0x00, 0x00,
                     0xFF, 0xFF, 0xFF, 0xFF
                     ]));
             assert.equal(frame.errorCode, 4294967295);
@@ -477,9 +479,9 @@ describe('Http2RstStreamFrame:', function () {
         beforeEach(function () {
             frame = new h2frame.Http2RstStreamFrame();
         });
-        it('should return a buffer, and its length should be 12 octets.', function () {
+        it('should return a buffer, and its length should be 13 octets.', function () {
             assert(frame.getBuffer() instanceof Buffer);
-            assert.equal(frame.getBuffer().length, 12);
+            assert.equal(frame.getBuffer().length, 13);
         });
     });
 });
@@ -510,7 +512,7 @@ describe('Http2SettingsFrame:', function () {
         });
     });
     describe('A frame created with buffer', function () {
-        var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]);
+        var buf = new Buffer([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]);
         var frame = new h2frame.Http2SettingsFrame(buf);
         it('should have same data', function () {
             assert.deepEqual(frame.getBuffer(), buf);
@@ -612,7 +614,7 @@ describe('Http2SettingsFrame:', function () {
         });
         it('should return 1 if there is one params. #1', function () {
             frame = new h2frame.Http2SettingsFrame(new Buffer([
-                    0x00, 0x06, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x06, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0x00]));
             assert.equal(frame.getParamCount(), 1);
             frame.setParam(1, 100);
@@ -636,7 +638,7 @@ describe('Http2SettingsFrame:', function () {
         });
         it('should return the id and value of the parameter specified with the index', function () {
             frame = new h2frame.Http2SettingsFrame(new Buffer([
-                    0x00, 0x0C, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x0C, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xFF,
                     0x00, 0x02, 0x00, 0x00, 0xFF, 0xFF]));
             var param = frame.getParamByIndex(0);
@@ -660,7 +662,7 @@ describe('Http2SettingsFrame:', function () {
         });
         it('should return the id and value of the parameter specified with id', function () {
             frame = new h2frame.Http2SettingsFrame(new Buffer([
-                    0x00, 0x0C, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x0C, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xFF,
                     0x00, 0x02, 0x00, 0x00, 0xFF, 0xFF]));
             var param = frame.getParamById(1);
@@ -684,7 +686,7 @@ describe('Http2SettingsFrame:', function () {
         });
         it('should return a index of the parameter specified with id', function () {
             frame = new h2frame.Http2SettingsFrame(new Buffer([
-                    0x00, 0x0C, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+                    0x00, 0x00, 0x0C, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
                     0x00, 0x01, 0x00, 0x00, 0x00, 0xFF,
                     0x00, 0x02, 0x00, 0x00, 0xFF, 0xFF]));
             var index = frame.getParamIndexOf(0x01);
@@ -778,7 +780,7 @@ describe('Http2PushPromiseFrame:', function () {
     });
     describe('padLength property', function () {
         var frame = new h2frame.Http2PushPromiseFrame(new Buffer([
-                0x00, 0x09, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x09, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
                 0x00, 0x00, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04, 0x00]));
         it('should return length of pad', function () {
             assert.equal(frame.padLength, 1);
@@ -788,7 +790,7 @@ describe('Http2PushPromiseFrame:', function () {
     });
     describe('#toString()', function () {
         var frame = new h2frame.Http2PushPromiseFrame(new Buffer([
-                0x00, 0x06, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x06, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x01, 0x00, 0x00, 0x00, 0x00, 0x00]));
         it('should return a string containing frame name', function () {
             assert.notEqual(frame.toString().indexOf('PUSH_PROMISE'), -1);
@@ -807,7 +809,7 @@ describe('Http2PushPromiseFrame:', function () {
     });
     describe('#getBuffer()', function () {
         var buf = new Buffer([
-            0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04])
         var frame = new h2frame.Http2PushPromiseFrame(buf);
         it('should return a buffer, and its length should be sum of frame length plus header size', function () {
@@ -820,7 +822,7 @@ describe('Http2PushPromiseFrame:', function () {
     });
     describe('#getBlock()', function () {
         var frame = new h2frame.Http2PushPromiseFrame(new Buffer([
-                0x00, 0x0A, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x0A, 0x05, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01,
                 0x00, 0x00, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04, 0x00]));
         it('should return a buffer, and its length should be same as frame length minus padding length', function () {
             assert(frame.getBlock() instanceof Buffer);
@@ -833,19 +835,19 @@ describe('Http2PushPromiseFrame:', function () {
     });
     describe('#setBlock()', function () {
         var frame = new h2frame.Http2PushPromiseFrame(new Buffer([
-                0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0xFF, 0x01, 0x02, 0x03, 0x04]));
         it('should change block part', function () {
             var block = new Buffer([0x11, 0x22, 0x33, 0x44, 0x55, 0x66]);
             frame.setBlock(block);
             assert.deepEqual(frame.getBlock(), block);
-            assert.deepEqual(frame.getBuffer().slice(12), block);
+            assert.deepEqual(frame.getBuffer().slice(FRAME_HEADER_SIZE + 4), block);
             frame.setBlock(block, 2);
             assert.deepEqual(frame.getBlock(), block);
-            assert.deepEqual(frame.getBuffer().slice(13, 19), block);
+            assert.deepEqual(frame.getBuffer().slice(FRAME_HEADER_SIZE + 5, FRAME_HEADER_SIZE + 11), block);
             frame.setBlock(block);
             assert.deepEqual(frame.getBlock(), block);
-            assert.deepEqual(frame.getBuffer().slice(12), block);
+            assert.deepEqual(frame.getBuffer().slice(FRAME_HEADER_SIZE + 4), block);
         });
     });
 });
@@ -876,7 +878,7 @@ describe('Http2PingFrame:', function () {
         });
     });
     describe('A frame created with buffer', function () {
-        var buf = new Buffer([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]);
+        var buf = new Buffer([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10]);
         var frame = new h2frame.Http2PingFrame(buf);
         it('should have same data', function () {
             assert.deepEqual(frame.getBuffer(), buf);
@@ -907,9 +909,9 @@ describe('Http2PingFrame:', function () {
     });
     describe('#getBuffer()', function () {
         var frame = new h2frame.Http2PingFrame();
-        it('should return a buffer, and its length should be 16 octets', function () {
+        it('should return a buffer, and its length should be 17 octets', function () {
             assert(frame.getBuffer() instanceof Buffer);
-            assert.equal(frame.getBuffer().length, 16);
+            assert.equal(frame.getBuffer().length, 17);
         });
     });
     describe('#getPayload()', function () {
@@ -935,49 +937,49 @@ describe('Http2FrameFactory:', function () {
         it('should create an appropriate frame instance', function () {
             var frame, buf;
             // DATA
-            buf = new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2DataFrame);
             // HEADERS
-            buf = new Buffer([0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2HeadersFrame);
             // PRIORITY
-            buf = new Buffer([0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2PriorityFrame);
             // RST_STREAM
-            buf = new Buffer([0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2RstStreamFrame);
             // SETTINGS
-            buf = new Buffer([0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2SettingsFrame);
             // PUSH_PROMISE
-            buf = new Buffer([0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2PushPromiseFrame);
             // PING
-            buf = new Buffer([0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2PingFrame);
             // GOAWAY
-            buf = new Buffer([0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2GoawayFrame);
             // WINDOW_UPDATE
-            buf = new Buffer([0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2WindowUpdateFrame);
             // CONTINUATION
-            buf = new Buffer([0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2ContinuationFrame);
         });
         it('should create an Http2Frame instance if type code is unknown', function () {
             var buf, frame;
-            buf = new Buffer([0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2Frame);
         });
@@ -1007,12 +1009,12 @@ describe('Http2FrameFactory:', function () {
     describe('#registerFrame()', function () {
         it('should add a supported frame type', function () {
             var buf, frame, newFrameClass;
-            buf = new Buffer([0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof h2frame.Http2Frame);
             newFrameClass = function () {};
             h2frame.Http2FrameFactory.registerFrame(0xFF, newFrameClass);
-            buf = new Buffer([0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00]);
+            buf = new Buffer([0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00]);
             frame = h2frame.Http2FrameFactory.createFrame(buf);
             assert(frame instanceof newFrameClass);
         });
