@@ -538,6 +538,20 @@ describe('Http2SettingsFrame:', function () {
             assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_INITIAL_WINDOW_SIZE, 0x4);
         });
     });
+    describe('PARAM_SETTINGS_MAX_FRAME_SIZE', function () {
+        it('should be a constant value for SETTINGS_MAX_FRAME_SIZE(0x5)', function () {
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_FRAME_SIZE, 0x5);
+            h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_FRAME_SIZE= 9999;
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_FRAME_SIZE, 0x5);
+        });
+    });
+    describe('PARAM_SETTINGS_MAX_HEADER_LIST_SIZE', function () {
+        it('should be a constant value for SETTINGS_MAX_HEADER_LIST_SIZE(0x6)', function () {
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_HEADER_LIST_SIZE, 0x6);
+            h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_HEADER_LIST_SIZE= 9999;
+            assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_HEADER_LIST_SIZE, 0x6);
+        });
+    });
     describe('#toString()', function () {
         var frame = new h2frame.Http2SettingsFrame();
         it('should return a string containing frame name', function () {
