@@ -3,6 +3,15 @@ h2cli
 
 A command line interface for HTTP/2
 
+How to use
+----------
+[npm package](https://www.npmjs.org/package/h2cli) is available.
+```
+$ npm  install h2cli
+$ h2cli
+```
+
+
 Documents
 ---------
 
@@ -23,7 +32,7 @@ Status
 - HPACK
     - Passes all (#00 to 31) test stories in [http2jp/hpack-test-case](https://github.com/http2jp/hpack-test-case/)
         - Decoder can interpret wire data of nghttp2.
-        - Encoder works, but the implementation never use 'without Indexing', 'never Indexed'.
+        - Encoder works, but the implementation never use 'without Indexing' nor 'never Indexed'.
 - Source code
     - Smells bad.
 
@@ -36,7 +45,7 @@ I developed it just for fun, but it would be useful for debugging your HTTP/2 im
 It works like this.
 
 ```
-$ node h2cli.js
+$ h2cli
 h2> connect https://twitter.com/
 Connecting to twitter.com:443
 NPN Protocol: h2-13
