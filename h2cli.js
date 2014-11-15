@@ -11,10 +11,10 @@ var homeDir = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'
 var config, configData, pref;
 try {
     configData = fs.readFileSync(homeDir + '/.h2cli/config', 'utf-8');
+    config = JSON.parse(configData);
 } catch (e) {
-    console.log(e);
+    config = {};
 }
-config = JSON.parse(configData);
 
 var h2client = h2.createClient(config); 
 
