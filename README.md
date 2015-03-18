@@ -25,7 +25,6 @@ Status
 [![Coverage Status](https://img.shields.io/coveralls/maskit/h2cli.svg)](https://coveralls.io/r/maskit/h2cli?branch=master)
 [![Code Climate](https://codeclimate.com/github/maskit/h2cli.png)](https://codeclimate.com/github/maskit/h2cli)
 
-- h2-14 and hpack-09.
 - HTTP/2
     - Stream priority is not implemented yet.
     - No error handlings.
