@@ -1,13 +1,28 @@
 How-To
 =======
 
-There are no documentations yet but you can do these things below.
+How to send a GET/HEAD request
+------------------------------
 
-How to send a GET request
--------------------------
+You can send a GET request with :command:`get` command.
+You can also specify a authority.
+
+Samples:
+* :command:`get /`
+* :command:`get /index.html`
+* :command:`get //example.com/`
+* :command:`get //example.com/index.html`
 
 How to send a POST request
 --------------------------
+
+You can send a POST request with :command:`post` command.
+
+Samples:
+* :command:`post / xxx`
+* :command:`post /comment xxx`
+* :command:`post //example.com/ xxx`
+* :command:`post //example.com/comment xxx`
 
 How to configure default settings
 ---------------------------------
@@ -38,7 +53,7 @@ May the tab completion be with you.
   > h2cli.util.saveFrame(frame, 'somewhere/foo.frame');
   undefined
 
-How to create a custom command
+How to add a custom command
 ------------------------------
 
 h2cli reads commands from ~/.h2cli/cmd/ .
