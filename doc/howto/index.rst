@@ -8,6 +8,7 @@ You can send a GET request with :command:`get` command.
 You can also specify a authority.
 
 Samples:
+
 * :command:`get /`
 * :command:`get /index.html`
 * :command:`get //example.com/`
@@ -19,6 +20,7 @@ How to send a POST request
 You can send a POST request with :command:`post` command.
 
 Samples:
+
 * :command:`post / xxx`
 * :command:`post /comment xxx`
 * :command:`post //example.com/ xxx`
