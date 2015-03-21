@@ -985,16 +985,16 @@ describe('Http2FrameFactory:', function () {
                 }
             };
             blockSize = 0;
-            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, []);
+            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, [], 0);
             assert.equal(frames.length, 1);
             blockSize = 1;
-            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, []);
+            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, [], 0);
             assert.equal(frames.length, 1);
-            blockSize = 16383;
-            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, []);
+            blockSize = 16384 - 6;
+            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, [], 0);
             assert.equal(frames.length, 1);
-            blockSize = 16384;
-            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, []);
+            blockSize = 16384 - 5;
+            frames = h2frame.Http2FrameFactory.createRequestFrames(hpackMock, [], 0);
             assert.equal(frames.length, 2);
         });
     });
