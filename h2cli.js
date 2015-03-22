@@ -41,9 +41,10 @@ rl.setColor = function (colorAttr) {
 rl.clearColor = function () {
     this.write("\033[m");
 };
+var callback = function() { rl.prompt(); };
 rl.prompt();
 rl.on('line', function(line) {
-    var callback = function() { rl.prompt(); };
+    rl.pause();
     var args = line.trim().split(' ');
     var c = cmd.getCommand(args[0]);
     if (c) {
