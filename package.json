@@ -17,6 +17,7 @@
     "url": "git://github.com/maskit/h2cli.git"
   },
   "keywords": [
+    "RFC7540",
     "http2",
     "HTTP/2"
   ],
@@ -36,5 +37,8 @@
     "blanket": {
       "pattern": "h2cli/lib"
     }
+  },
+  "dependencies": {
+    "hpack": "^1.0.0"
   }
 }
