@@ -40,5 +40,8 @@
   },
   "dependencies": {
     "hpack": "^1.0.0"
+  },
+  "engine": {
+    "node": "^0.12.0"
   }
 }
