@@ -790,6 +790,19 @@ describe('Http2PingFrame:', function () {
             assert.equal(h2frame.Http2PingFrame.FLAG_ACK, 0x1);
         });
     });
+    describe('payload property', function () {
+        var frame = new h2frame.Http2PingFrame();
+        it('should return a buffer, and its length should be 8 octets', function () {
+            assert(frame.payload instanceof Buffer);
+            assert.equal(frame.payload.length, 8);
+        });
+        it('should be writable', function () {
+            var expected = new Buffer([0x11, 0x22, 0x33, 0x44, 0xAA, 0xBB, 0xCC, 0xDD]);
+            frame.payload = expected;
+            assert.deepEqual(frame.payload, expected);
+            assert.deepEqual(frame.getBuffer().slice(FRAME_HEADER_SIZE, FRAME_HEADER_SIZE + 8), expected);
+        });
+    });
     describe('#getBuffer()', function () {
         var frame = new h2frame.Http2PingFrame();
         it('should return a buffer, and its length should be 17 octets', function () {
@@ -797,20 +810,65 @@ describe('Http2PingFrame:', function () {
             assert.equal(frame.getBuffer().length, 17);
         });
     });
-    describe('#getPayload()', function () {
-        var frame = new h2frame.Http2PingFrame();
-        it('should return a buffer, and its length should be 8 octets', function () {
-            assert(frame.getPayload() instanceof Buffer);
-            assert.equal(frame.getPayload().length, 8);
+});
+describe('Http2GoawayFrame:', function () {
+    describe('TYPE_CODE', function () {
+        it('should be a constant value for type code', function () {
+            assert.equal(h2frame.Http2GoawayFrame.TYPE_CODE, 0x7);
+            h2frame.Http2DataFrame.TYPE_CODE = 128;
+            assert.equal(h2frame.Http2GoawayFrame.TYPE_CODE, 0x7);
         });
     });
-    describe('#setPayload()', function () {
-        var frame = new h2frame.Http2PingFrame();
-        it('should set the given data into the buffer', function () {
-            var expected = new Buffer([0x11, 0x22, 0x33, 0x44, 0xAA, 0xBB, 0xCC, 0xDD]);
-            frame.setPayload(expected);
-            assert.deepEqual(frame.getPayload(), expected);
-            assert.deepEqual(frame.getBuffer().slice(FRAME_HEADER_SIZE, FRAME_HEADER_SIZE + 8), expected);
+    describe('lastStreamId property', function () {
+        var frame;
+        it('should be the last stream id', function () {
+            frame = new h2frame.Http2GoawayFrame();
+            assert.equal(frame.lastStreamId, 0);
+            frame = new h2frame.Http2GoawayFrame(new Buffer([
+                    0x00, 0x00, 0x04, 0x07, 0x00, 0x00, 0x0, 0x00, 0x03,
+                    0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0xFF,
+                    ]));
+            assert.equal(frame.lastStreamId, 1);
+        });
+        it('should be the last stream id', function () {
+            frame = new h2frame.Http2GoawayFrame();
+            frame.lastStreamId = 123;
+            assert.equal(frame.lastStreamId, 123);
+        });
+    });
+    describe('errorCode property', function () {
+        var frame;
+        it('should be the error code', function () {
+            frame = new h2frame.Http2GoawayFrame();
+            assert.equal(frame.errorCode, 0);
+            frame = new h2frame.Http2GoawayFrame(new Buffer([
+                    0x00, 0x00, 0x04, 0x07, 0x00, 0x00, 0x0, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                    ]));
+            assert.equal(frame.errorCode, 4294967295);
+        });
+        it('should be the last stream id', function () {
+            frame = new h2frame.Http2GoawayFrame();
+            frame.errorCode = 123;
+            assert.equal(frame.errorCode, 123);
+        });
+    });
+    describe('additionalDebugData property', function () {
+        var frame;
+        it('should be the additional debug data', function () {
+            frame = new h2frame.Http2GoawayFrame();
+            assert.deepEqual(frame.additionalDebugData, new Buffer(0));
+            frame = new h2frame.Http2GoawayFrame(new Buffer([
+                    0x00, 0x00, 0x04, 0x07, 0x00, 0x00, 0x0, 0x00, 0x00,
+                    0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+                    0x01, 0x02, 0x03, 0x04
+                    ]));
+            assert.deepEqual(frame.additionalDebugData, new Buffer([0x01, 0x02, 0x03, 0x04]));
+        });
+        it('should be writable', function () {
+            frame = new h2frame.Http2GoawayFrame();
+            frame.additionalDebugData = new Buffer([0x05, 0x06, 0x07, 0x08, 0x9, 0xA, 0x0B, 0x0C]);
+            assert.deepEqual(frame.additionalDebugData, new Buffer([0x05, 0x06, 0x07, 0x08, 0x9, 0xA, 0x0B, 0x0C]));
         });
     });
 });
