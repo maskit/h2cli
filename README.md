@@ -22,16 +22,12 @@ Status
 ------
 
 [![Build Status](https://travis-ci.org/maskit/h2cli.svg?branch=master)](https://travis-ci.org/maskit/h2cli)
-[![Coverage Status](https://img.shields.io/coveralls/maskit/h2cli.svg)](https://coveralls.io/r/maskit/h2cli?branch=master)
+[![Coverage Status](https://coveralls.io/repos/maskit/h2cli/badge.svg?branch=master&service=github)](https://coveralls.io/github/maskit/h2cli?branch=master)
 [![Code Climate](https://codeclimate.com/github/maskit/h2cli.png)](https://codeclimate.com/github/maskit/h2cli)
 
 - HTTP/2
     - Stream priority is not implemented yet.
     - No error handlings.
-- HPACK
-    - Passes all (#00 to 31) test stories in [http2jp/hpack-test-case](https://github.com/http2jp/hpack-test-case/)
-        - Decoder can interpret wire data of nghttp2.
-        - Encoder works, but the implementation never use 'without Indexing' nor 'never Indexed'.
 - Source code
     - Smells bad.
 
