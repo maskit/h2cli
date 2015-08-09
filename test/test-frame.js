@@ -164,29 +164,6 @@ describe('Http2DataFrame:', function () {
             assert.equal(frame.padLength, 0);
         });
     });
-    describe('#toString()', function () {
-        var frame;
-
-        beforeEach(function () {
-            frame = new h2frame.Http2DataFrame();
-        });
-
-        it('should return a string containing frame name', function () {
-            assert.notEqual(frame.toString().indexOf('DATA'), -1);
-        });
-        it('should return a string representation of the flags', function () {
-            assert.equal(frame.toString().indexOf('END_STREAM'), -1);
-            assert.equal(frame.toString().indexOf('PADDED'), -1);
-            frame.flags = h2frame.Http2DataFrame.FLAG_END_STREAM;
-            assert.notEqual(frame.toString().indexOf('END_STREAM'), -1);
-            frame.flags = h2frame.Http2DataFrame.FLAG_PADDED;
-            assert.notEqual(frame.toString().indexOf('PADDED'), -1);
-        });
-        it('should return a string containing padding length', function () {
-            frame.setData(new Buffer(128), 10);
-            assert.notEqual(frame.toString().indexOf('Padding: 10'), -1);
-        });
-    });
     describe('#getBuffer()', function () {
         var buf = new Buffer([
             0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -297,32 +274,6 @@ describe('Http2HeadersFrame:', function () {
             assert.equal(h2frame.Http2HeadersFrame.FLAG_PRIORITY, 0x20);
             h2frame.Http2HeadersFrame.FLAG_PRIORITY = 9999;
             assert.equal(h2frame.Http2HeadersFrame.FLAG_PRIORITY, 0x20);
-        });
-    });
-    describe('#toString()', function () {
-        var frame = new h2frame.Http2HeadersFrame();
-        it('should return a string containing frame name', function () {
-            assert.notEqual(frame.toString().indexOf('HEADERS'), -1);
-        });
-        it('should return a string representation of the flags', function () {
-            assert.equal(frame.toString().indexOf('END_STREAM'), -1);
-            frame.flags = h2frame.Http2HeadersFrame.FLAG_END_STREAM;
-            assert.notEqual(frame.toString().indexOf('END_STREAM'), -1);
-        });
-        it('should return a string representation of the flags', function () {
-            assert.equal(frame.toString().indexOf('END_HEADERS'), -1);
-            frame.flags = h2frame.Http2HeadersFrame.FLAG_END_HEADERS;
-            assert.notEqual(frame.toString().indexOf('END_HEADERS'), -1);
-        });
-        it('should return a string representation of the flags', function () {
-            assert.equal(frame.toString().indexOf('PADDED'), -1);
-            frame.flags = h2frame.Http2HeadersFrame.FLAG_PADDED;
-            assert.notEqual(frame.toString().indexOf('PADDED'), -1);
-        });
-        it('should return a string representation of the flags', function () {
-            assert.equal(frame.toString().indexOf('PRIORITY'), -1);
-            frame.flags = h2frame.Http2HeadersFrame.FLAG_PRIORITY;
-            assert.notEqual(frame.toString().indexOf('PRIORITY'), -1);
         });
     });
     describe('padLength property', function () {
@@ -443,15 +394,6 @@ describe('Http2RstStreamFrame:', function () {
             assert.equal(frame.errorCode, 4294967295);
         });
     });
-    describe('#toString()', function () {
-        var frame = new h2frame.Http2RstStreamFrame();
-        it('should return a string containing frame name', function () {
-            assert.notEqual(frame.toString().indexOf('RST_STREAM'), -1);
-        });
-        it('should return a string representation of the error code', function () {
-            assert.notEqual(frame.toString().indexOf('Error Code:'), -1);
-        });
-    });
     describe('#getBuffer()', function () {
         var frame;
         beforeEach(function () {
@@ -550,29 +492,6 @@ describe('Http2SettingsFrame:', function () {
             assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_HEADER_LIST_SIZE, 0x6);
             h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_HEADER_LIST_SIZE= 9999;
             assert.equal(h2frame.Http2SettingsFrame.PARAM_SETTINGS_MAX_HEADER_LIST_SIZE, 0x6);
-        });
-    });
-    describe('#toString()', function () {
-        var frame = new h2frame.Http2SettingsFrame();
-        it('should return a string containing frame name', function () {
-            assert.notEqual(frame.toString().indexOf('SETTINGS'), -1);
-        });
-        it('should return a string representation of the flags', function () {
-            assert.equal(frame.toString().indexOf('ACK'), -1);
-            frame.flags = h2frame.Http2SettingsFrame.FLAG_ACK;
-            assert.notEqual(frame.toString().indexOf('ACK'), -1);
-        });
-        it('should return a string containing parameter information', function () {
-            assert.equal(frame.toString().indexOf('Params:'), -1);
-            frame.setParam(1, 100);
-            frame.setParam(2, 200);
-            frame.setParam(3, 300);
-            frame.setParam(4, 400);
-            assert.notEqual(frame.toString().indexOf('Params:'), -1);
-            assert.notEqual(frame.toString().indexOf('SETTINGS_HEADER_TABLE_SIZE: 100'), -1);
-            assert.notEqual(frame.toString().indexOf('SETTINGS_ENABLE_PUSH: 200'), -1);
-            assert.notEqual(frame.toString().indexOf('SETTINGS_MAX_CONCURRENT_STREAMS: 300'), -1);
-            assert.notEqual(frame.toString().indexOf('SETTINGS_INITIAL_WINDOW_SIZE: 400'), -1);
         });
     });
     describe('#getBuffer()', function () {
@@ -780,25 +699,6 @@ describe('Http2PushPromiseFrame:', function () {
             assert.equal(frame.padLength, 0);
         });
     });
-    describe('#toString()', function () {
-        var frame = new h2frame.Http2PushPromiseFrame(new Buffer([
-                0x00, 0x00, 0x06, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x01, 0x00, 0x00, 0x00, 0x00, 0x00]));
-        it('should return a string containing frame name', function () {
-            assert.notEqual(frame.toString().indexOf('PUSH_PROMISE'), -1);
-        });
-        it('should return a string representation of the flags', function () {
-            assert.equal(frame.toString().indexOf('END_HEADERS'), -1);
-            assert.equal(frame.toString().indexOf('PADDED'), -1);
-            frame.flags = h2frame.Http2PushPromiseFrame.FLAG_END_HEADERS;
-            assert.notEqual(frame.toString().indexOf('END_HEADERS'), -1);
-            frame.flags = h2frame.Http2PushPromiseFrame.FLAG_PADDED;
-            assert.notEqual(frame.toString().indexOf('PADDED'), -1);
-        });
-        it('should return a string containing payload information', function () {
-            assert.notEqual(frame.toString().indexOf('Promised Stream ID:'), -1);
-        });
-    });
     describe('#getBuffer()', function () {
         var buf = new Buffer([
             0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -888,15 +788,6 @@ describe('Http2PingFrame:', function () {
             assert.equal(h2frame.Http2PingFrame.FLAG_ACK, 0x1);
             h2frame.Http2PingFrame.FLAG_ACK = 9999;
             assert.equal(h2frame.Http2PingFrame.FLAG_ACK, 0x1);
-        });
-    });
-    describe('#toString()', function () {
-        var frame = new h2frame.Http2PingFrame();
-        it('should return a string containing frame name', function () {
-            assert.notEqual(frame.toString().indexOf('PING'), -1);
-        });
-        it('should return a string containing payload information', function () {
-            assert.notEqual(frame.toString().indexOf('Payload:'), -1);
         });
     });
     describe('#getBuffer()', function () {
