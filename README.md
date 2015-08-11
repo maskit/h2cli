@@ -25,11 +25,8 @@ Status
 [![Coverage Status](https://coveralls.io/repos/maskit/h2cli/badge.svg?branch=master&service=github)](https://coveralls.io/github/maskit/h2cli?branch=master)
 [![Code Climate](https://codeclimate.com/github/maskit/h2cli.png)](https://codeclimate.com/github/maskit/h2cli)
 
-- HTTP/2
-    - Stream priority is not implemented yet.
-    - No error handlings.
-- Source code
-    - Smells bad.
+- Supports h2, h2-14, and h2c
+- Stream priority is not implemented yet.
 
 
 What is this for?
