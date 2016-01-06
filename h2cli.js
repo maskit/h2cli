@@ -28,31 +28,41 @@ if (fs.existsSync(homeDir + '/.h2cli/cmd')) {
 require('./lib/ext/altsvc');
 require('./lib/ext/blocked');
 
+if (process.argv.length === 2) {
+    var completer = function (line) {
+        return cmd.getCompletions(line);
+    };
 
-var completer = function (line) {
-    return cmd.getCompletions(line);
-};
-
-var rl = require('readline').createInterface(process.stdin, process.stdout, completer);
-rl.setPrompt('h2> ');
-rl.setColor = function (colorAttr) {
-    this.write("\033[" + colorAttr + "m");
-};
-rl.clearColor = function () {
-    this.write("\033[m");
-};
-var callback = function() { rl.prompt(); };
-rl.prompt();
-rl.on('line', function(line) {
-    rl.pause();
-    var args = line.trim().split(' ');
+    var rl = require('readline').createInterface(process.stdin, process.stdout, completer);
+    rl.setPrompt('h2> ');
+    rl.setColor = function (colorAttr) {
+        this.write("\033[" + colorAttr + "m");
+    };
+    rl.clearColor = function () {
+        this.write("\033[m");
+    };
+    var callback = function() { rl.prompt(); };
+    rl.prompt();
+    rl.on('line', function(line) {
+        rl.pause();
+        var args = line.trim().split(' ');
+        var c = cmd.getCommand(args[0]);
+        if (c) {
+            c.exec(args, callback);
+        } else {
+            callback();
+        }
+    }).on('close', function() {
+        process.exit(0);
+    });
+} else {
+    var args = process.argv;
+    args.shift();
+    args.shift();
     var c = cmd.getCommand(args[0]);
     if (c) {
-        c.exec(args, callback);
-    } else {
-        callback();
+        c.exec(args, function () {
+            cmd.getCommand('close').exec();
+        });
     }
-}).on('close', function() {
-    process.exit(0);
-});
-
+}
