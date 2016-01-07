@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
+var url = require('url');
 var path = require('path');
 var h2 = require('./lib/h2');
 var cmd = require('./lib/command');
@@ -59,10 +60,28 @@ if (process.argv.length === 2) {
     var args = process.argv;
     args.shift();
     args.shift();
-    var c = cmd.getCommand(args[0]);
-    if (c) {
-        c.exec(args, function () {
-            cmd.getCommand('close').exec();
+    var parsedUrl = url.parse(args[0]);
+    var execute = function () {
+        var c = cmd.getCommand(args[0]);
+        if (c) {
+            c.exec(args, function () {
+                cmd.getCommand('close').exec();
+            });
+        }
+    };
+    if (parsedUrl.protocol && parsedUrl.protocol.substr(0, 4) === 'http') {
+        args.shift();
+        var secure = parsedUrl.protocol === 'https:';
+        var port = parsedUrl.port ? parsedUrl.port : (secure ? 443 : 80);
+        h2client.connect(parsedUrl.hostname, port, {
+            secure: secure,
+            useNpn: true
+        }, function (stream, error) {
+            if (!error) {
+                execute();
+            }
         });
+    } else {
+        execute();
     }
 }
