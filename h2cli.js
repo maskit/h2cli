@@ -29,12 +29,12 @@ if (fs.existsSync(homeDir + '/.h2cli/cmd')) {
 require('./lib/ext/altsvc');
 require('./lib/ext/blocked');
 
+var rl = require('readline').createInterface(process.stdin, process.stdout, completer);
 if (process.argv.length === 2) {
     var completer = function (line) {
         return cmd.getCompletions(line);
     };
 
-    var rl = require('readline').createInterface(process.stdin, process.stdout, completer);
     rl.setPrompt('h2> ');
     rl.setColor = function (colorAttr) {
         this.write("\033[" + colorAttr + "m");
@@ -65,7 +65,11 @@ if (process.argv.length === 2) {
         var c = cmd.getCommand(args[0]);
         if (c) {
             c.exec(args, function () {
-                cmd.getCommand('close').exec();
+                rl.on('line', function () {
+                    rl.close();
+                    cmd.getCommand('close').exec();
+                });
+                rl.prompt();
             });
         }
     };
