@@ -4,7 +4,9 @@
   "version": "0.19.0",
   "main": "./index.js",
   "bin": {
-    "h2cli": "./h2cli.js"
+    "h2cli": "./h2cli.js",
+    "h2req": "./h2req.js",
+    "h2res": "./h2res.js"
   },
   "directories": {
     "test": "test"
