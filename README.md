@@ -50,6 +50,11 @@ How does this work?
 It works like this.
 
 ```
+$ h2req request.json | openssl s_client -alpn h2 -connect localhost:443 -quiet | h2res
+$ h2seq sequence.json | openssl s_client -alpn h2 -connect localhost:443 -quiet | h2res
+```
+
+```
 $ h2cli
 h2> connect https://twitter.com/
 Connecting to twitter.com:443
