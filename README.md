@@ -34,6 +34,19 @@ What is this for?
 
 I developed it just for fun, but it would be useful for debugging your HTTP/2 implementation, for understanding HTTP/2 protocols, etc.
 
+What does contain this?
+-----------------------
+
+h2cli package contains 4 commands.
+
+- h2cli is an interactive command line interface
+- h2req is a request generator, which outputs binary request data converted from JSON formatted request definition
+- h2res is a response parser, which outputs human readable frame information and HTTP response data
+- h2seq is a frame generator, which outputs binary H2 frames converted from JSON formatted frame sequenc
+
+How does this work?
+-----------------
+
 It works like this.
 
 ```
