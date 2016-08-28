@@ -1,0 +1,9 @@
+{
+    "headers": [
+        [":method", "GET"],
+        [":scheme", "https"],
+        [":authority", "localhost"],
+        [":path", "/"]
+    ],
+    "body": ""
+}

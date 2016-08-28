@@ -1,0 +1,13 @@
+[
+    { "action": "send", "stream": 0, "type": "preface"},
+    { "action": "send", "stream": 0, "type": "settings", "flags": "",    "settings": [] },
+    { "action": "send", "stream": 0, "type": "settings", "flags": "ACK", "settings": [] },
+    { "action": "send", "stream": 1, "type": "headers",  "flags": "END_HEADERS,END_STREAM", "headers": [
+        [":method", "GET"],
+        [":scheme", "https"],
+        [":authority", "localhost"],
+        [":path", "/"]
+    ]},
+    { "action": "pause", "duration": 3000 },
+    { "action": "send", "stream": 0, "type": "goaway" }
+]
